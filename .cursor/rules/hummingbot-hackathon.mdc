@@ -1,0 +1,14 @@
+---
+description: Agent Builders Cup — Orca tight-range entry constraints
+alwaysApply: true
+---
+
+# hummingbot-hackathon
+
+- Venue is **Orca / Solana** only. Do not add Gate, Bitget, Binance Global, Hyperliquid, or Derive execution.
+- Policy lives in `src/orca_tight_range/logic.py`. Controllers and backtests call `decide()`; do not fork a second policy.
+- LLM / Condor must not place orders. Execution is Hummingbot `LPExecutor` + Gateway.
+- Do not use `~/proj/hummingbot` (2024). Install v2.16+ per `docs/INSTALL_PLAN.md`.
+- Never invent a `pool_address`. Never commit wallet keys.
+- Record parameter changes in `docs/TRIALS_LEDGER.md`. Code freeze is 2026-08-31.
+- Keep `submission/strategy.md` honest: no live P&L claims without a trial row.
