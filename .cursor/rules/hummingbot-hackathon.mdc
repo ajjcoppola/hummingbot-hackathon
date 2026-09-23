@@ -10,5 +10,5 @@ alwaysApply: true
 - Condor is the local harness (`/gateway`, `/lp`, `/bots`, `/web`). LLM / `/agent` must not place or cancel LP. Execution is Hummingbot `LPExecutor` + Gateway.
 - Do not use `~/proj/hummingbot` (2024). Install Condor + API + Gateway per `docs/INSTALL_PLAN.md`.
 - Never invent a `pool_address`. Never commit wallet keys.
-- Record parameter changes in `docs/TRIALS_LEDGER.md`. Code freeze is 2026-08-31.
+- Record parameter changes in `docs/TRIALS_LEDGER.md`. Refine until finals; registration/judging window ends **2026-09-30**; finals start **2026-10-01** (no hard Aug-31 freeze — see Botcamp timeline).
 - Keep `submission/strategy.md` honest: no live P&L claims without a trial row.

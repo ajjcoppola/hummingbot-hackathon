@@ -2,7 +2,7 @@
 
 Agent Builders Cup entry for the **Orca** team: an active tight-range Whirlpool LP on SOL/USDC.
 
-This repo is the **application pack + 8-day build guide**. Official rules freeze code at **2026-08-31**. Finals are a 48-hour unattended race on **2026-10-01–02** with **$800 USDC** provided by Botcamp. Scoring is Volume 40% / P&L 40% / HBOT Vote 20%.
+This repo is the **application pack + build guide**. Official Botcamp timeline (2026): registration through **Sep 30**; hackathon build **Aug 1 – Oct 1** (refine up to finals); judging **Sep 1–30**; finals **Oct 1–9** with Botcamp-custodied capital. Scoring is Volume 40% / P&L 40% / HBOT Vote 20%. (Older “freeze Aug 31” language in early drafts is superseded.)
 
 Do **not** use the 2024 Hummingbot trees under `~/proj/hummingbot*`. Live work is **Condor + Hummingbot API Docker + Gateway Docker** (v2.16+). Condor may start Gateway, run `/lp`, and host the bot. It must not let the LLM place orders. See [`docs/INSTALL_PLAN.md`](docs/INSTALL_PLAN.md).
 
