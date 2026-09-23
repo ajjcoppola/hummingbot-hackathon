@@ -4,7 +4,7 @@ Agent Builders Cup entry for the **Orca** team: an active tight-range Whirlpool 
 
 This repo is the **application pack + 8-day build guide**. Official rules freeze code at **2026-08-31**. Finals are a 48-hour unattended race on **2026-10-01–02** with **$800 USDC** provided by Botcamp. Scoring is Volume 40% / P&L 40% / HBOT Vote 20%.
 
-Do **not** use the 2024 Hummingbot trees under `~/proj/hummingbot*`. Live work needs Hummingbot **v2.16+** plus Gateway.
+Do **not** use the 2024 Hummingbot trees under `~/proj/hummingbot*`. Live work is **Condor + Hummingbot API Docker + Gateway Docker** (v2.16+). Condor may start Gateway, run `/lp`, and host the bot. It must not let the LLM place orders. See [`docs/INSTALL_PLAN.md`](docs/INSTALL_PLAN.md).
 
 ## Tonight (get the application in)
 
@@ -37,7 +37,7 @@ The LLM never places a trade. Condor is optional later for narration only.
 |------|------|
 | [`submission/`](submission/) | Paste-ready Botcamp fields, `strategy.md`, demo shot list |
 | [`docs/DAY_PLAN.md`](docs/DAY_PLAN.md) | Aug 24–31 build calendar |
-| [`docs/INSTALL_PLAN.md`](docs/INSTALL_PLAN.md) | Docker Hummingbot + Gateway + optional zipline 3.11 |
+| [`docs/INSTALL_PLAN.md`](docs/INSTALL_PLAN.md) | Condor + Gateway Docker journey; optional zipline 3.11 |
 | [`docs/LEGAL_VENUE_GATE.md`](docs/LEGAL_VENUE_GATE.md) | Why Orca (US ToS) and what is banned |
 | [`docs/SHERLOCK_BRIEF.md`](docs/SHERLOCK_BRIEF.md) | Investigation that produced this path |
 | [`src/orca_tight_range/logic.py`](src/orca_tight_range/logic.py) | Testable policy (no Hummingbot import) |

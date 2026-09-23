@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <style>
+      .title { font: 700 28px Helvetica, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 16px Helvetica, Arial, sans-serif; fill: #475569; }
+      .box { fill: #ffffff; stroke: #1e293b; stroke-width: 2; rx: 10; }
+      .diamond { fill: #fefce8; stroke: #ca8a04; stroke-width: 2; }
+      .start { fill: #eff6ff; stroke: #2563eb; }
+      .action { fill: #ecfdf5; stroke: #059669; }
+      .stop { fill: #fef2f2; stroke: #dc2626; }
+      .defer { fill: #fff7ed; stroke: #ea580c; }
+      .label { font: 700 16px Helvetica, Arial, sans-serif; fill: #0f172a; }
+      .small { font: 400 13px Helvetica, Arial, sans-serif; fill: #334155; }
+      .arrow { stroke: #0f172a; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .yes { font: 700 12px Helvetica, Arial, sans-serif; fill: #059669; }
+      .no { font: 700 12px Helvetica, Arial, sans-serif; fill: #dc2626; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#0f172a"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="900" fill="#f8fafc"/>
+  <text x="48" y="48" class="title">Decision loop - logic.py decide()</text>
+  <text x="48" y="76" class="subtitle">Events: RangeOpened | Hold | RebalanceDeferred | RebalanceExecuted | RateLimited | StopLossTriggered</text>
+
+  <rect x="560" y="110" width="280" height="70" class="box start"/>
+  <text x="600" y="140" class="label">Every tick: Snapshot</text>
+  <text x="600" y="162" class="small">spot | equity | momentum | reb history</text>
+
+  <path class="diamond" d="M700,230 L820,290 L700,350 L580,290 Z"/>
+  <text x="645" y="285" class="label">Drawdown</text>
+  <text x="655" y="305" class="small">&gt;= 15%?</text>
+
+  <rect x="980" y="255" width="220" height="70" class="box stop"/>
+  <text x="1010" y="285" class="label">STOP</text>
+  <text x="1010" y="307" class="small">StopLossTriggered</text>
+
+  <path class="diamond" d="M700,400 L840,470 L700,540 L560,470 Z"/>
+  <text x="640" y="460" class="label">Have open</text>
+  <text x="655" y="482" class="small">position?</text>
+
+  <rect x="160" y="435" width="240" height="70" class="box action"/>
+  <text x="190" y="465" class="label">OPEN tight RANGE</text>
+  <text x="190" y="487" class="small">+/-1.5% | skew_bias 0.6</text>
+
+  <path class="diamond" d="M700,590 L840,660 L700,730 L560,660 Z"/>
+  <text x="655" y="650" class="label">Price in</text>
+  <text x="665" y="672" class="small">band?</text>
+
+  <rect x="980" y="625" width="220" height="70" class="box action"/>
+  <text x="1020" y="655" class="label">HOLD</text>
+  <text x="1020" y="677" class="small">collect fees</text>
+
+  <rect x="160" y="620" width="260" height="100" class="box defer"/>
+  <text x="180" y="650" class="label">Out of range</text>
+  <text x="180" y="672" class="small">if flush - RebalanceDeferred</text>
+  <text x="180" y="692" class="small">if &gt;=6/hr - RateLimited</text>
+  <text x="180" y="712" class="small">else close + reopen band</text>
+
+  <path class="arrow" d="M700,180 V230"/>
+  <path class="arrow" d="M820,290 H980"/>
+  <text x="860" y="280" class="yes">YES</text>
+  <path class="arrow" d="M700,350 V400"/>
+  <text x="710" y="380" class="no">NO</text>
+
+  <path class="arrow" d="M560,470 H400"/>
+  <text x="450" y="460" class="no">NO</text>
+  <path class="arrow" d="M700,540 V590"/>
+  <text x="710" y="570" class="yes">YES</text>
+
+  <path class="arrow" d="M840,660 H980"/>
+  <text x="880" y="650" class="yes">YES</text>
+  <path class="arrow" d="M560,660 H420"/>
+  <text x="480" y="650" class="no">NO</text>
+
+  <rect x="60" y="800" width="1280" height="60" class="box"/>
+  <text x="80" y="835" class="small">Live path: same loop via Gateway orca/clmm + LPExecutor / lp_rebalancer (RANGE, width 1.5, threshold 0.8).</text>
+</svg>

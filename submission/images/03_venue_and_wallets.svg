@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="720" viewBox="0 0 1400 720">
+  <defs>
+    <style>
+      .title { font: 700 28px Helvetica, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 16px Helvetica, Arial, sans-serif; fill: #475569; }
+      .box { fill: #ffffff; stroke: #1e293b; stroke-width: 2; rx: 12; }
+      .ok { fill: #ecfdf5; stroke: #059669; }
+      .bad { fill: #fef2f2; stroke: #dc2626; }
+      .warn { fill: #fff7ed; stroke: #ea580c; }
+      .label { font: 700 17px Helvetica, Arial, sans-serif; fill: #0f172a; }
+      .small { font: 400 14px Helvetica, Arial, sans-serif; fill: #334155; }
+      .mono { font: 500 13px Menlo, Monaco, Consolas, monospace; fill: #0f172a; }
+      .arrow { stroke: #0f172a; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#0f172a"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="720" fill="#f1f5f9"/>
+  <text x="48" y="48" class="title">Venue gate + wallet roles (US-legal Orca path)</text>
+  <text x="48" y="76" class="subtitle">Chrome extension wallet is NOT the Gateway bot wallet - only Gateway signs LP txs</text>
+
+  <rect x="60" y="140" width="380" height="200" class="box warn"/>
+  <text x="80" y="175" class="label">Chrome wallet (you)</text>
+  <text x="80" y="205" class="mono">GycxG3EF...EPEd9</text>
+  <text x="80" y="235" class="small">Faucet / personal Devnet SOL</text>
+  <text x="80" y="260" class="small">Not imported into Gateway by default</text>
+  <text x="80" y="285" class="small">Send SOL to Gateway address to fund LP</text>
+  <text x="80" y="315" class="small">Extension cannot run the bot alone</text>
+
+  <rect x="520" y="140" width="400" height="200" class="box ok"/>
+  <text x="540" y="175" class="label">Gateway bot wallet</text>
+  <text x="540" y="205" class="mono">2ZuShDjg...UNXoB</text>
+  <text x="540" y="235" class="small">Imported keystore in hummingbot-api</text>
+  <text x="540" y="260" class="small">Holds SOL + devUSDC + Whirlpool NFT</text>
+  <text x="540" y="285" class="small">Signs open / close / swap / rebalance</text>
+  <text x="540" y="315" class="small">Shown in demo video + Explorer txs</text>
+
+  <rect x="1000" y="140" width="340" height="200" class="box ok"/>
+  <text x="1020" y="175" class="label">Allowed venue</text>
+  <text x="1020" y="210" class="small">Orca Whirlpools</text>
+  <text x="1020" y="235" class="small">Solana self-custodial</text>
+  <text x="1020" y="260" class="small">Gateway orca/clmm</text>
+  <text x="1020" y="285" class="small">Optional: Meteora backup</text>
+  <text x="1020" y="315" class="small">(same Gateway path)</text>
+
+  <path class="arrow" d="M440,240 H520"/>
+  <path class="arrow" d="M920,240 H1000"/>
+
+  <rect x="60" y="400" width="1280" height="120" class="box bad"/>
+  <text x="80" y="440" class="label">Not used (US ToS / out of scope for this entry)</text>
+  <text x="80" y="475" class="small">Gate | Bitget | Binance Global | Hyperliquid | Derive - no CEX race accounts; Orca is the legal venue.</text>
+
+  <rect x="60" y="560" width="1280" height="110" class="box"/>
+  <text x="80" y="595" class="label">Devnet proof artifacts</text>
+  <text x="80" y="625" class="small">Pool 3KBZiL2... | Position EE6hDunE... | open/close/reopen in docs/TRIALS_LEDGER.md T001-T003</text>
+  <text x="80" y="650" class="small">Loom: https://www.loom.com/share/687d7c1047534d259b19a4807ea0ef61</text>
+</svg>

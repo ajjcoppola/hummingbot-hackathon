@@ -1,0 +1,20 @@
+# Devnet scale target — $800 RANGE (same pool/params as orca_tight_devnet).
+# Do NOT deploy until Gateway wallet 2ZuShDjg… has enough SOL + devUSDC.
+# As of 2026-09-22 wallet ~7 SOL + ~19 free devUSDC (+ LP inventory) — BLOCKED on faucet.
+# Record deploy in docs/TRIALS_LEDGER.md.
+
+id: orca_tight_devnet_800
+controller_name: lp_rebalancer
+controller_type: generic
+connector_name: solana-devnet
+lp_provider: orca/clmm
+trading_pair: SOL-devUSDC
+pool_address: "3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt"
+total_amount_quote: 800
+side: RANGE
+position_width_pct: 1.5
+position_offset_pct: -0.01
+rebalance_threshold_pct: 0.8
+autoswap: true
+swap_buffer_pct: 0.01
+manual_kill_switch: false

@@ -1,6 +1,6 @@
 # Botcamp strategy form — paste-ready
 
-Use these fields on https://www.botcamp.xyz (New Strategy / Hackathon application). All markdown is allowed in the long fields.
+Use these fields on [https://www.botcamp.xyz](https://www.botcamp.xyz) (New Strategy / Hackathon application). All markdown is allowed in the long fields.
 
 ## Strategy Type
 
@@ -38,21 +38,27 @@ The LLM never places trades. Policy is deterministic Python (`src/orca_tight_ran
 - **Research data only (no execution):** Binance SOL/USDT OHLCV for range/rebalance search
 - **Not used (US ToS):** Binance Global, Gate, Bitget, Hyperliquid, Derive
 
+
+
 ## Parameters
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `range_width_pct` | 1.5 | Half-width of the tick band around spot (±1.5%) |
-| `skew_bias` | 0.6 | Fraction of the band on the momentum-favored side (0.5 = symmetric) |
-| `rebalance_trigger_pct` | 0.8 | Min deviation from center before a reopen is allowed |
-| `volatility_exhaustion_window_s` | 300 | Lookback used to tell a flush from a trend |
-| `max_rebalances_per_hour` | 6 | Gas / MEV cap |
-| `capital_allocation_usdc` | 800 | Race starting capital (Botcamp-funded) |
-| `stop_loss_drawdown_pct` | 15 | Hard halt |
+
+| Parameter                        | Default | Description                                                         |
+| -------------------------------- | ------- | ------------------------------------------------------------------- |
+| `range_width_pct`                | 1.5     | Half-width of the tick band around spot (±1.5%)                     |
+| `skew_bias`                      | 0.6     | Fraction of the band on the momentum-favored side (0.5 = symmetric) |
+| `rebalance_trigger_pct`          | 0.8     | Min deviation from center before a reopen is allowed                |
+| `volatility_exhaustion_window_s` | 300     | Lookback used to tell a flush from a trend                          |
+| `max_rebalances_per_hour`        | 6       | Gas / MEV cap                                                       |
+| `capital_allocation_usdc`        | 800     | Race starting capital (Botcamp-funded)                              |
+| `stop_loss_drawdown_pct`         | 15      | Hard halt                                                           |
+
+
+
 
 ## Status
 
-In development — policy + offline simulator are in-repo and unit-tested. Gateway / Devnet open-close-rebalance is the Aug 24–31 build-window work. Code freeze is 2026-08-31.
+Mainnet Orca SOL-USDC smoke live (T009 — ~$100 quote on Whirlpool `Czfq3xZZ…`; see `docs/TRIALS_LEDGER.md`). Devnet Gateway open→close→reopen proven earlier (T001–T003). Official `lp_rebalancer` + `orca/clmm` is the unattended race path; custom `orca_tight_range` policy shares the same width/trigger defaults. Code freeze was 2026-08-31; live ops stay ledger-honest (no P&L claims without a trial row).
 
 ## Events
 
@@ -63,14 +69,22 @@ In development — policy + offline simulator are in-repo and unit-tested. Gatew
 - `RateLimited` — gas cap hit
 - `StopLossTriggered` — 15% drawdown; agent halted
 
+
+
 ## Video Link
 
-Paste the YouTube / Loom / Drive URL after recording [`demo_script.md`](demo_script.md).
+```
+https://www.loom.com/share/687d7c1047534d259b19a4807ea0ef61
+```
+
+Images for Flowchart & Images: `submission/images/01_architecture.png`, `02_decision_loop.png`, `03_venue_and_wallets.png`.
 
 ## Team ranking
 
-1. Orca
+1. **Orca**
 2. Meteora (same Gateway / Solana LP path if Orca seats fill)
+
+
 
 ## One-paragraph team application (if they ask "why Orca")
 

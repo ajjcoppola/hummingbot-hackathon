@@ -1,0 +1,21 @@
+# Tiny mainnet smoke — $100 USDC RANGE on Orca SOL-USDC.
+# Fill pool_address from Gateway pool list before deploy. Never invent.
+# Record param changes in docs/TRIALS_LEDGER.md. Mainnet DEX is taxable.
+
+id: orca_tight_mainnet_smoke
+controller_name: lp_rebalancer
+controller_type: generic
+connector_name: solana-mainnet-beta
+lp_provider: orca/clmm
+trading_pair: SOL-USDC
+# Orca SOL-USDC whirlpool (tickSpacing 4 / feeRate 400), verified 2026-09-22 via
+# https://api.orca.so/v2/solana/pools (tokens=SOL+USDC, sort=tvl).
+pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"
+total_amount_quote: 100
+side: RANGE
+position_width_pct: 1.5
+position_offset_pct: -0.01
+rebalance_threshold_pct: 0.8
+autoswap: true
+swap_buffer_pct: 0.01
+manual_kill_switch: false

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="780" viewBox="0 0 1400 780">
+  <defs>
+    <style>
+      .title { font: 700 28px Helvetica, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 16px Helvetica, Arial, sans-serif; fill: #475569; }
+      .box { fill: #ffffff; stroke: #1e293b; stroke-width: 2; rx: 12; }
+      .box-policy { fill: #eff6ff; stroke: #2563eb; }
+      .box-exec { fill: #ecfdf5; stroke: #059669; }
+      .box-chain { fill: #fff7ed; stroke: #ea580c; }
+      .box-harness { fill: #f8fafc; stroke: #64748b; }
+      .label { font: 700 18px Helvetica, Arial, sans-serif; fill: #0f172a; }
+      .small { font: 400 14px Helvetica, Arial, sans-serif; fill: #334155; }
+      .arrow { stroke: #0f172a; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .note { font: 500 13px Helvetica, Arial, sans-serif; fill: #b91c1c; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#0f172a"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="780" fill="#f1f5f9"/>
+  <text x="48" y="48" class="title">Orca Tight-Range Leverage Farmer - Architecture</text>
+  <text x="48" y="76" class="subtitle">Agent Builders Cup | Hummingbot Gateway orca/clmm | LLM never places LP</text>
+
+  <rect x="60" y="140" width="280" height="160" class="box box-policy"/>
+  <text x="80" y="175" class="label">1. Policy (deterministic)</text>
+  <text x="80" y="205" class="small">src/orca_tight_range/logic.py</text>
+  <text x="80" y="228" class="small">decide() - OPEN / HOLD /</text>
+  <text x="80" y="248" class="small">REBALANCE / STOP</text>
+  <text x="80" y="278" class="small">+/-1.5% | skew | flush filter | 15% kill</text>
+
+  <rect x="400" y="140" width="300" height="160" class="box box-policy"/>
+  <text x="420" y="175" class="label">2. V2 Controller</text>
+  <text x="420" y="205" class="small">lp_rebalancer (official race path)</text>
+  <text x="420" y="228" class="small">or orca_tight_range wrapper</text>
+  <text x="420" y="258" class="small">configs/lp_rebalancer_devnet.yml</text>
+  <text x="420" y="280" class="small">RANGE | width 1.5 | threshold 0.8</text>
+
+  <rect x="760" y="140" width="260" height="160" class="box box-exec"/>
+  <text x="780" y="175" class="label">3. LPExecutor</text>
+  <text x="780" y="205" class="small">Hummingbot strategy_v2</text>
+  <text x="780" y="228" class="small">open / monitor / auto-close</text>
+  <text x="780" y="258" class="small">keep_position + limit prices</text>
+  <text x="780" y="280" class="small">autoswap when unbalanced</text>
+
+  <rect x="1080" y="140" width="260" height="160" class="box box-exec"/>
+  <text x="1100" y="175" class="label">4. Gateway</text>
+  <text x="1100" y="205" class="small">lp_provider: orca/clmm</text>
+  <text x="1100" y="228" class="small">network: solana-devnet</text>
+  <text x="1100" y="248" class="small">(race: mainnet-beta)</text>
+  <text x="1100" y="278" class="small">wallet: Gateway keystore</text>
+
+  <rect x="400" y="400" width="640" height="150" class="box box-chain"/>
+  <text x="420" y="440" class="label">5. Orca Whirlpools (Solana)</text>
+  <text x="420" y="470" class="small">Devnet pool: 3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt (SOL-devUSDC)</text>
+  <text x="420" y="495" class="small">Proven loop: open - close - reopen (TRIALS_LEDGER T001-T003)</text>
+  <text x="420" y="520" class="small">Race pair: SOL/USDC mainnet | No Gate / Bitget / Binance Global / HL / Derive</text>
+
+  <rect x="60" y="400" width="280" height="150" class="box box-harness"/>
+  <text x="80" y="440" class="label">Harness (optional)</text>
+  <text x="80" y="470" class="small">Condor /gateway /lp /bots /web</text>
+  <text x="80" y="495" class="small">Telegram + dashboard only</text>
+  <text x="80" y="520" class="note">LLM must NOT place/cancel LP</text>
+
+  <path class="arrow" d="M340,220 H400"/>
+  <path class="arrow" d="M700,220 H760"/>
+  <path class="arrow" d="M1020,220 H1080"/>
+  <path class="arrow" d="M1210,300 V400"/>
+  <path class="arrow" d="M200,400 V300"/>
+
+  <rect x="60" y="620" width="1280" height="100" class="box"/>
+  <text x="80" y="655" class="label">Scoring objective (48h finals)</text>
+  <text x="80" y="685" class="small">Maximize Fees - Realized IL - Gas | Volume 40% / PnL 40% / HBOT Vote 20%</text>
+  <text x="80" y="705" class="small">Code freeze 2026-08-31 | Demo shows Devnet Gateway proof, not fabricated mainnet PnL</text>
+</svg>

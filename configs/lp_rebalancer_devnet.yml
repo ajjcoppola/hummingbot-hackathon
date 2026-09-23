@@ -1,0 +1,21 @@
+# Official lp_rebalancer fallback for Devnet smoke / unattended loop.
+# Race artifact until orca_tight_range is on the bot image.
+# Record param changes in docs/TRIALS_LEDGER.md.
+
+id: orca_tight_devnet
+controller_name: lp_rebalancer
+controller_type: generic
+connector_name: solana-devnet
+lp_provider: orca/clmm
+trading_pair: SOL-devUSDC
+pool_address: "3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt"
+# Sized to ~wallet free quote after 2026-09-22 SOL→devUSDC swap (~77.55).
+# Leave native SOL for rent/gas; autoswap can rebalance inventory.
+total_amount_quote: 77
+side: RANGE
+position_width_pct: 1.5
+position_offset_pct: -0.01
+rebalance_threshold_pct: 0.8
+autoswap: true
+swap_buffer_pct: 0.01
+manual_kill_switch: false
