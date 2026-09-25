@@ -18,9 +18,17 @@ One row per parameter change. No silent grid sweeps. Deflate any Sharpe-like cla
 | T010 | 2026-09-24 | 1.5     | 0.05      | —    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | orphan recycle / managed OPEN | fees on close ~0.0011 SOL + ~0.146 USDC | — | rent refund ~0.0084 | — | RECYCLE — closed orphan `FZf1…` (tx `3jfTKrnS…`); deployed `orca_tight_mainnet_smoke-20260924-213341`; new LP `DWhducqt…` **in-range** (status PASS). Free wallet ~0.091 SOL + ~9.95 USDC (rest in LP). Threshold cut to **0.05** before redeploy (Sherlock: OOR≠close at 0.8). See `docs/SHERLOCK_REBALANCE_20260924.md`. |
 | T011 | 2026-09-24 | 1.5     | 0.05      | —    | same                                          | ~18.9h (overnight)         | pending end ~$0.015 USDC; max seen ~$0.155 | — | free SOL +0.083 | MTM ~+$0.59 overnight; **+$1.74 vs $119.56 money-in** | PASS rebals (7 total, 2 overnight) then **STUCK** — LP `gvVUtyJs…` OOR past limit ~8h+ (spot~121.5 vs upper~116.3). In-range ~46% / overnight ~15%. Morning: soft-restart/recycle before T012 width 1.0. Tearsheet+chart: `MORNING_EVAL_20260925.md`. |
 | T012 | 2026-09-25 | 1.5     | 0.05      | —    | same                                          | endurance ≥48h (Cup-length) | —                                 | —      | —                    | —                 | START — after unstick recycle to `BEbZALii…` / bot `…164103`. Tag **alpha-checkpoint**. Reporter `T012_mainnet_100_endurance_20260925` + past-limit watchdog. Width 1.0 (C1) deferred until endurance baseline. See `docs/ALPHA_CHECKPOINT_20260925.md`. |
+| T013 | 2026-09-25 | 1.0     | 0.05      | —    | same                                          | chain spot only; snapshots not on this host | pending ~0.000251 SOL + ~0.0244 USDC (~$0.055) | — | free wallet 0.092 SOL + 11.68 USDC | chain money-out **~$121.63** vs money-in **$119.56** (~+$2.07); vs HODL ~$120.40 (~+$1.23). **Not a closed trial.** | WATCH — LP `87j3M5WK…` in range, band [121.49, 122.71], spot ~121.87, width ~1.00%. Not past auto-close limits; no recycle. n_rebals and window in-range % unknown. Repo YAML still 1.5 (not edited). Reporter/watchdog not visible from the cloud VM. |
 
 
 
+
+### Live ops notes (2026-09-25 T013 chain check)
+
+- ~19:04Z public mark only (Orca pool/position + Solana balances). Run id `T013_mainnet_100_width1_20260925`. No `data/devnet_runs/…` snapshots on this host, so no clean-mark window, no n_rebals, no in-range %.
+- One token-2022 position NFT on `Czfq3xZZ…`: `87j3M5WKRFgWgsU2DUxGv4Y1Ai29DBoN7qqKRzxf8AXU` (not the T012 address `BEbZALii…`). In range. Spot inside 0.05% auto-close limits. `adopt --recycle` not run.
+- Local Docker/API (`127.0.0.1:8000`) unreachable from the cloud VM. Watchdog was not restarted here.
+- Canvas: `t013-mainnet-money-in-out`. Do not treat the +$2.07 chain mark as Cup race P&L.
 
 ### Live ops notes (2026-09-22 resume)
 
