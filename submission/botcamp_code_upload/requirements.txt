@@ -1,0 +1,8 @@
+# Offline research + tests only. Live execution uses Hummingbot + Gateway (Docker).
+pandas>=2.0
+numpy>=1.24
+pytest>=8.0
+
+# Optional: zipline-reloaded requires Python 3.11. Install in a separate venv.
+# zipline-reloaded
+# exchange-calendars

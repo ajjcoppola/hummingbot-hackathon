@@ -1,0 +1,16 @@
+Agent Builders Cup — Orca tight-range LP
+Bundle prepared 2026-08-27
+
+Start here:
+  submission/strategy.md
+  submission/APPLICATION.md
+  docs/INSTALL_PLAN.md
+  docs/TRIALS_LEDGER.md (T001–T003 Devnet open/close/reopen)
+  configs/lp_rebalancer_devnet.yml
+  src/orca_tight_range/logic.py
+  controllers/orca_tight_range_controller.py
+  research/orca_backtest_zipline.py
+  research/zipline_to_gateway_bridge.py
+
+Devnet pool (verified): 3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt
+No wallet keys or .env files are included.

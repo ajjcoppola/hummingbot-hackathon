@@ -15,17 +15,19 @@ Venue stays **Orca / Solana only**. LLM still must not place/cancel LP unless we
 
 ---
 
-## 0. Pull overnight facts (15 min)
+## 0. Pull overnight facts (15 min) — filled 2026-09-24 AM
 
-From reporter `T009_mainnet_100_20260923` + `positions_owned` + ledger:
+From reporter `T009_mainnet_100_20260923` + live `positions_owned`:
 
-- [ ] Uptime %, n rebalances, in-range %
-- [ ] Fees accrued (base/quote) vs gas/SOL spent
-- [ ] MTM Δ vs HODL-ish inventory mark (honest, not Sharpe)
-- [ ] Failed txs / Helius 429s / `CloseType.FAILED`
-- [ ] Still in-range on `Czfq3xZZ…`? Band still ~±1.5%?
+- [x] Uptime %: bot **100%** during 3.3h window; then reporter timeouts
+- [x] Rebalances: **0** (same position address all night)
+- [x] In-range %: **90.4%** in window; **now OOR** (spot ~115.67 > upper ~115.25)
+- [x] Fees: ~0.19 USDC-equiv by window end; **~0.61 USDC + ~0.005 SOL** pending live
+- [x] MTM Δ: **~+0.19** over window (not race P&L claim)
+- [x] Failures: open-time `CloseType.FAILED:1`; overnight Gateway **timeouts**; Condor **not running**
+- [x] Band still ±1.5% of open — price walked through upper; no recenter yet
 
-**Decide:** baseline OK to tune from, or fix ops first.
+**Decide:** fix ops first (Condor + why no OOR rebalance), then tune width.
 
 ---
 

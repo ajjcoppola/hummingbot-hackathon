@@ -15,7 +15,7 @@ total_amount_quote: 100
 side: RANGE
 position_width_pct: 1.5
 position_offset_pct: -0.01
-rebalance_threshold_pct: 0.8
+rebalance_threshold_pct: 0.05
 autoswap: true
 swap_buffer_pct: 0.01
 manual_kill_switch: false
