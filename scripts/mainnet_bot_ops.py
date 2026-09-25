@@ -538,7 +538,7 @@ def main() -> int:
     sp_rep = sub.add_parser("restart-reporter", help="restart endurance reporter")
     sp_rep.add_argument("--run-id", required=True)
     sp_rep.add_argument("--quote-token", default="USDC")
-    sp_rep.add_argument("--width", default="1.5")
+    sp_rep.add_argument("--width", default="1.0")
     sp_rep.add_argument("--threshold", default="0.05")
     sp_rep.add_argument("--total-amount-quote", default="100")
     sp_rep.add_argument("--interval", type=int, default=120)

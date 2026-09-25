@@ -65,7 +65,7 @@ python3 research/orca_backtest_zipline.py
 
 ## Live status (honest — see `docs/TRIALS_LEDGER.md`)
 
-As of **2026-09-23 (T009)**: **mainnet** Orca SOL-USDC Whirlpool `Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE` is live with official `lp_rebalancer` (~$100 quote, width 1.5% / trigger 0.8%). Wallet `2ZuShDjg…`. Position in-range; fees accruing (not a finalized P&L claim — see ledger + reporter `T009_mainnet_100_20260923`). Pool screen gate: `docs/POOL_SCREEN_GATE.md` / T008. Devnet remains harness-only (T007 HOLD on quiet pool). LLM / Condor `/agent` does **not** place or cancel LP.
+As of **2026-09-25 (T013)**: **mainnet** Orca SOL-USDC Whirlpool `Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE` is the live venue on official `lp_rebalancer` (~$100 quote, width **1.0%** / `rebalance_threshold_pct` **0.05**). Wallet `2ZuShDjg…`. Hands-off window through **2026-09-27 ~19:12Z**. Not a finalized P&L claim — see `docs/TRIALS_LEDGER.md` and reporter `T013_mainnet_100_width1_20260925`. LLM / Condor `/agent` does **not** place or cancel LP.
 
 ## Code freeze
 

@@ -13,7 +13,8 @@ trading_pair: SOL-USDC
 pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"
 total_amount_quote: 100
 side: RANGE
-position_width_pct: 1.5
+# T013: 48h hands-off from 2026-09-25 ~19:12Z. Do not widen during this window.
+position_width_pct: 1.0
 position_offset_pct: -0.01
 rebalance_threshold_pct: 0.05
 autoswap: true
