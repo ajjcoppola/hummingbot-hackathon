@@ -18,9 +18,16 @@ One row per parameter change. No silent grid sweeps. Deflate any Sharpe-like cla
 | T010 | 2026-09-24 | 1.5     | 0.05      | —    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | orphan recycle / managed OPEN | fees on close ~0.0011 SOL + ~0.146 USDC | — | rent refund ~0.0084 | — | RECYCLE — closed orphan `FZf1…` (tx `3jfTKrnS…`); deployed `orca_tight_mainnet_smoke-20260924-213341`; new LP `DWhducqt…` **in-range** (status PASS). Free wallet ~0.091 SOL + ~9.95 USDC (rest in LP). Threshold cut to **0.05** before redeploy (Sherlock: OOR≠close at 0.8). See `docs/SHERLOCK_REBALANCE_20260924.md`. |
 | T011 | 2026-09-24 | 1.5     | 0.05      | —    | same                                          | ~18.9h (overnight)         | pending end ~$0.015 USDC; max seen ~$0.155 | — | free SOL +0.083 | MTM ~+$0.59 overnight; **+$1.74 vs $119.56 money-in** | PASS rebals (7 total, 2 overnight) then **STUCK** — LP `gvVUtyJs…` OOR past limit ~8h+ (spot~121.5 vs upper~116.3). In-range ~46% / overnight ~15%. Morning: soft-restart/recycle before T012 width 1.0. Tearsheet+chart: `MORNING_EVAL_20260925.md`. |
 | T012 | 2026-09-25 | 1.5     | 0.05      | —    | same                                          | endurance ≥48h (Cup-length) | —                                 | —      | —                    | —                 | START — after unstick recycle to `BEbZALii…` / bot `…164103`. Tag **alpha-checkpoint**. Reporter `T012_mainnet_100_endurance_20260925` + past-limit watchdog. Width 1.0 (C1) deferred until endurance baseline. See `docs/ALPHA_CHECKPOINT_20260925.md`. |
+| T013 | 2026-09-25 | 1.0     | 0.05      | —    | same                                          | open; chain read 2026-09-26 14:08Z | uncollected est. ~$0.26 (0.001083 SOL + 0.1316 USDC). Collected fees already sit in the wallet mark. | — | — | chain MTM **~$121.27** vs money-in **$119.56** (**+$1.71**) and vs HODL **~$120.20** (**+$1.07**). Not a closed trial. | OPEN / **ACTION** — on-chain width ~1.0% on LP `6WDEpBLi…` band **[121.20, 122.42]**, spot **~120.65**, past lower auto-close **~121.14** for **~17h**. **n_rebals=2** close→open after 19:12Z (20:39Z, 21:05Z), then no wallet txs. In-range % **unknown** (no `T013_mainnet_100_width1_20260925` snapshots). Cloud VM could not reach Docker/API, so recycle was not run. Mac: `adopt --recycle --restart-gateway`, then reporter + watchdog for that run-id. Do not soft-restart. Committed YAML still `position_width_pct: 1.5` (left unchanged). |
 
 
 
+
+### Live ops notes (2026-09-26 T013 check)
+
+- Chain read 14:08Z, not a reporter tearsheet. Wallet `2ZuShDjg…` holds one Token-2022 position NFT `D22naGuo…` → LP `6WDEpBLi…` (opened 2026-09-25 21:05Z). Prior start LP `87j3M5WK…` is closed.
+- Spot ~120.65 is below the 0.05% auto-close limit (~121.14). Last wallet tx 21:06Z. That is a stranded past-limit LP. This VM has no Docker and port 8000 is closed, so `status` / watchdog restart / `adopt --recycle` did not run.
+- Two successful close→open cycles after the 19:12Z hands-off start, plus a failed open (custom 6017) and a follow-up `InsufficientFundsForRent`. No second LP is open.
 
 ### Live ops notes (2026-09-22 resume)
 

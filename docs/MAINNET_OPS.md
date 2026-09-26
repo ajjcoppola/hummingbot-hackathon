@@ -27,14 +27,14 @@ python3 scripts/mainnet_bot_ops.py adopt
 python3 scripts/mainnet_bot_ops.py adopt --recycle --restart-gateway
 
 # Reporter (threshold must match live YAML — currently 0.05)
-python3 scripts/mainnet_bot_ops.py restart-reporter --run-id T011_mainnet_100_threshold005_20260924 --threshold 0.05
+python3 scripts/mainnet_bot_ops.py restart-reporter --run-id T013_mainnet_100_width1_20260925 --threshold 0.05
 ```
 
 ## Health watchdog (leave running)
 
 ```bash
 PYTHONUNBUFFERED=1 python3 -u research/mainnet_health_watchdog.py \
-  --reporter-run-id T011_mainnet_100_threshold005_20260924 \
+  --reporter-run-id T013_mainnet_100_width1_20260925 \
   --interval 120 \
   >> data/mainnet_watchdog/watchdog.log 2>&1 &
 ```
@@ -86,14 +86,14 @@ If bot is FAILED-open-spamming while an LP already exists:
 python3 scripts/mainnet_bot_ops.py adopt
 # or put capital back under bot control:
 python3 scripts/mainnet_bot_ops.py adopt --recycle --restart-gateway
-python3 scripts/mainnet_bot_ops.py restart-reporter --run-id T011_mainnet_100_threshold005_20260924 --threshold 0.05
+python3 scripts/mainnet_bot_ops.py restart-reporter --run-id T013_mainnet_100_width1_20260925 --threshold 0.05
 ```
 
 If still stuck HOLD with `position_info` FAIL and no LP:
 
 ```bash
 python3 scripts/mainnet_bot_ops.py hard-restart --restart-gateway
-python3 scripts/mainnet_bot_ops.py restart-reporter --run-id T011_mainnet_100_threshold005_20260924 --threshold 0.05
+python3 scripts/mainnet_bot_ops.py restart-reporter --run-id T013_mainnet_100_width1_20260925 --threshold 0.05
 ```
 
 **Why `adopt` (not hard-restart with open LP):** official `lp_rebalancer` does not attach an orphan on-chain position into a new executor. Redeploying while an LP exists tries a second OPEN, fails (insufficient free USDC), and spams `CloseType.FAILED`.
