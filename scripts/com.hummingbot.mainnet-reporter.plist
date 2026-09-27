@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Install (once):
+    cp scripts/com.hummingbot.mainnet-reporter.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.hummingbot.mainnet-reporter.plist
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hummingbot.mainnet-reporter</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/ajjc/proj/hummingbot-hackathon/scripts/launch_mainnet_reporter.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon/data/devnet_runs/launchd-reporter.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon/data/devnet_runs/launchd-reporter.err.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/Users/ajjc/.orbstack/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>REPORTER_RUN_ID</key>
+    <string>T015_mainnet_100_hb217_20260927</string>
+    <key>REPORTER_WIDTH</key>
+    <string>1.0</string>
+    <key>REPORTER_THRESHOLD_PCT</key>
+    <string>0.05</string>
+    <key>REPORTER_TOTAL_AMOUNT_QUOTE</key>
+    <string>100</string>
+  </dict>
+</dict>
+</plist>

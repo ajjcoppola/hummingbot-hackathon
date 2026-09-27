@@ -214,33 +214,51 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
     elif len(running) == 0 and len(pos) == 0:
         row["action"] = "alert_flat_no_bot"
         row["detail"] = "no bot and no LP — run: python3 scripts/mainnet_bot_ops.py hard-restart"
-    elif len(running) == 0 and len(pos) == 1:
-        row["action"] = "alert_orphan_lp"
-        row["detail"] = "LP open but no bot — run: python3 scripts/mainnet_bot_ops.py adopt --recycle"
-    elif past and state["past_limit_streak"] >= args.past_limit_polls and len(pos) == 1:
+    elif len(pos) == 1 and (
+        (len(running) == 0)  # orphan LP — recycle (was alert-only; stranded T014 for hours)
+        or (past and state["past_limit_streak"] >= args.past_limit_polls)
+    ):
+        reason = past_detail if past else "orphan_lp_no_running_bot"
+        if len(running) == 0 and not past:
+            reason = "orphan_lp_no_running_bot"
         last = state.get("last_recycle_ts") or 0
         if time.time() - last < args.recycle_cooldown_s:
-            row["action"] = "past_limit_cooldown"
+            row["action"] = "orphan_or_past_cooldown"
             row["detail"] = (
-                f"past_limit streak {state['past_limit_streak']} ({past_detail}) "
+                f"{reason} streak_past={state['past_limit_streak']} "
                 f"but recycle cooldown active"
             )
         elif args.dry_run:
             row["action"] = "would_adopt_recycle"
-            row["detail"] = past_detail
+            row["detail"] = reason
         else:
             result = adopt_recycle(restart_gateway_flag=True)
+            code = (result or {}).get("code", 1)
             row["action"] = "adopt_recycle"
             row["detail"] = {
-                "reason": past_detail,
+                "reason": reason,
+                "orphan": len(running) == 0,
+                "past": past,
                 "streak": state["past_limit_streak"],
                 "result": result,
             }
             state["last_recycle_ts"] = time.time()
             state["past_limit_streak"] = 0
             state["oor_streak"] = 0
-            if args.reporter_run_id:
-                row["reporter"] = restart_reporter(args.reporter_run_id)
+            if code != 0:
+                state["recycle_fail_streak"] = state.get("recycle_fail_streak", 0) + 1
+                row["action"] = "adopt_recycle_failed"
+                if state["recycle_fail_streak"] >= args.recycle_fail_alert:
+                    row["action"] = "alert_recycle_failed"
+                    row["detail"] = {
+                        **row["detail"],
+                        "fail_streak": state["recycle_fail_streak"],
+                        "hint": "manual: python3 scripts/mainnet_bot_ops.py --wait-s 300 adopt --recycle --restart-gateway",
+                    }
+            else:
+                state["recycle_fail_streak"] = 0
+                if args.reporter_run_id:
+                    row["reporter"] = restart_reporter(args.reporter_run_id)
     elif oor and not past and state["oor_streak"] >= args.oor_limit and running:
         bot = running[0]
         last = state.get("last_soft_restart_ts") or 0
@@ -302,6 +320,12 @@ def main() -> int:
     )
     p.add_argument("--restart-cooldown-s", type=int, default=900)
     p.add_argument("--recycle-cooldown-s", type=int, default=3600)
+    p.add_argument(
+        "--recycle-fail-alert",
+        type=int,
+        default=2,
+        help="Escalate to alert_recycle_failed after N failed adopt --recycle attempts",
+    )
     p.add_argument("--reporter-run-id", default="")
     p.add_argument("--reporter-stale-s", type=int, default=600)
     args = p.parse_args()

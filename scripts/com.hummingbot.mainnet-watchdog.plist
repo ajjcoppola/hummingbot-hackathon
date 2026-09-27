@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Install (once):
+    cp scripts/com.hummingbot.mainnet-watchdog.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.hummingbot.mainnet-watchdog.plist
+
+  Why: bare `python … &` dies with agent/shell teardown; KeepAlive restarts the recycler.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hummingbot.mainnet-watchdog</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/ajjc/proj/hummingbot-hackathon/scripts/launch_mainnet_watchdog.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon/data/mainnet_watchdog/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon/data/mainnet_watchdog/launchd.err.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/Users/ajjc/.orbstack/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>WATCHDOG_REPORTER_RUN_ID</key>
+    <string>T015_mainnet_100_hb217_20260927</string>
+    <key>WATCHDOG_THRESHOLD_PCT</key>
+    <string>0.05</string>
+  </dict>
+</dict>
+</plist>

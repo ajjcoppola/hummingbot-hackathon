@@ -45,6 +45,24 @@ def parse_ts(value: str | None) -> datetime | None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-id", required=True)
+    ap.add_argument(
+        "--money-in",
+        type=float,
+        default=None,
+        help="Baseline USD money-in for vs-HODL / edge lines (e.g. 119.56)",
+    )
+    ap.add_argument(
+        "--hodl-start-sol",
+        type=float,
+        default=None,
+        help="Optional: starting free+LP SOL qty for HODL benchmark",
+    )
+    ap.add_argument(
+        "--hodl-start-usdc",
+        type=float,
+        default=None,
+        help="Optional: starting free+LP USDC qty for HODL benchmark",
+    )
     args = ap.parse_args()
     run_dir = ROOT / "data" / "devnet_runs" / args.run_id
     if not run_dir.exists():
@@ -66,8 +84,34 @@ def main() -> int:
     in_range = snaps[-1].get("in_range") if snaps else None
     bot_up = sum(1 for s in snaps if s.get("bot_running"))
     uptime_pct = (100.0 * bot_up / len(snaps)) if snaps else 0.0
+    in_pct = (
+        100.0 * sum(1 for s in snaps if s.get("in_range") is True) / len(snaps) if snaps else 0.0
+    )
     txs = [e for e in events if e.get("tx") or e.get("signature") or e.get("type") == "tx"]
     n_tx = len(txs)
+
+    # Rough HODL: mark start inventory at end pool price (or money-in flat USD if no qty).
+    hodl_lines: list[str] = []
+    if snaps:
+        last = snaps[-1]
+        px = float(last.get("pool_price") or 0) or None
+        if px is None and last.get("positions"):
+            try:
+                px = float((last["positions"][0] or {}).get("price") or 0) or None
+            except (TypeError, ValueError, IndexError):
+                px = None
+        if args.hodl_start_sol is not None and args.hodl_start_usdc is not None and px:
+            hodl = args.hodl_start_sol * px + args.hodl_start_usdc
+            hodl_lines += [
+                f"- HODL mark (start qty @ end px {px:.4f}): {hodl:.4f}",
+                f"- LP book − HODL: {mtm1 - hodl:.4f}",
+            ]
+        elif args.money_in is not None:
+            hodl_lines += [
+                f"- Money-in baseline: {args.money_in:.4f}",
+                f"- End MTM − money-in: {mtm1 - args.money_in:.4f}",
+                "- (Pass --hodl-start-sol/--hodl-start-usdc for true IL-vs-HODL.)",
+            ]
 
     lines = [
         f"# Tearsheet — {args.run_id}",
@@ -81,14 +125,22 @@ def main() -> int:
         f"- Start MTM quote: {mtm0:.4f}",
         f"- End MTM quote: {mtm1:.4f}",
         f"- Δ MTM: {mtm1 - mtm0:.4f}",
+        f"- In-range % (snapshots): {in_pct:.1f}%",
         f"- Latest positions: {n_pos} (in_range={in_range})",
         f"- Bot uptime (snapshot %): {uptime_pct:.1f}%",
         f"- Event/tx rows: {n_tx}",
+        "",
+        "## IL / HODL",
+        "",
+    ]
+    lines.extend(hodl_lines or ["- No --money-in / HODL qty passed; see docs/IL_AND_POOL_DYNAMICS.md."])
+    lines += [
         "",
         "## Notes",
         "",
         "- MTM is reporter portfolio mark; not audited P&L.",
         "- Do not claim live edge without a matching `docs/TRIALS_LEDGER.md` row.",
+        "- IL primer: `docs/IL_AND_POOL_DYNAMICS.md`.",
         "",
     ]
     (run_dir / "tearsheet.md").write_text("\n".join(lines), encoding="utf-8")

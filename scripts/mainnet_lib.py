@@ -10,6 +10,7 @@ import subprocess
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
 
 DEFAULT_API = os.environ.get("HB_API_URL", "http://127.0.0.1:8000")
@@ -18,6 +19,9 @@ MAINNET_POOL = "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"
 MAINNET_NETWORK = "solana-mainnet-beta"
 MAINNET_CONFIG = "orca_tight_mainnet_smoke"
 MAINNET_PREFIX = "orca_tight_mainnet_smoke"
+# Cup pin — override with HB_BOT_IMAGE / HB_GATEWAY_IMAGE if needed
+BOT_IMAGE = os.environ.get("HB_BOT_IMAGE", "hummingbot/hummingbot:version-2.17.0")
+GATEWAY_IMAGE = os.environ.get("HB_GATEWAY_IMAGE", "hummingbot/gateway:version-2.17.0")
 
 
 def utc_now() -> str:
@@ -123,7 +127,7 @@ def deploy_mainnet(
     instance_name: str = MAINNET_PREFIX,
     config_name: str = MAINNET_CONFIG,
     credentials_profile: str = "master_account",
-    image: str = "hummingbot/hummingbot:latest",
+    image: str | None = None,
 ) -> Any:
     return client.request(
         "POST",
@@ -134,15 +138,22 @@ def deploy_mainnet(
             "controllers_config": [config_name],
             "max_global_drawdown_quote": None,
             "max_controller_drawdown_quote": None,
-            "image": image,
+            "image": image or BOT_IMAGE,
             "headless": True,
         },
         timeout=180.0,
     )
 
 
-def restart_gateway(client: ApiClient) -> Any:
-    return client.request("POST", "/gateway/restart", timeout=120.0)
+def restart_gateway(
+    client: ApiClient,
+    *,
+    image: str | None = None,
+    port: int = 15888,
+) -> Any:
+    """Recreate Gateway with pinned image (Cup: version-2.17.0)."""
+    body = {"image": image or GATEWAY_IMAGE, "port": port}
+    return client.request("POST", "/gateway/restart", body, timeout=180.0)
 
 
 def close_position(
@@ -167,13 +178,30 @@ def close_position(
     return client.request("POST", "/gateway/clmm/close", body, timeout=180.0)
 
 
+def _docker_bin() -> str:
+    """Resolve docker even under LaunchAgent's minimal PATH."""
+    for candidate in (
+        os.environ.get("DOCKER_BIN"),
+        "/usr/local/bin/docker",
+        "/opt/homebrew/bin/docker",
+        str(Path.home() / ".orbstack" / "bin" / "docker"),
+        "docker",
+    ):
+        if not candidate:
+            continue
+        if candidate == "docker" or Path(candidate).is_file():
+            return candidate
+    return "docker"
+
+
 def docker_rm_force(names: list[str]) -> list[str]:
     """Best-effort docker rm -f. Returns stderr lines on failure."""
     errors: list[str] = []
+    docker = _docker_bin()
     for name in names:
         try:
             subprocess.run(
-                ["docker", "rm", "-f", name],
+                [docker, "rm", "-f", name],
                 check=False,
                 capture_output=True,
                 text=True,
@@ -187,7 +215,7 @@ def docker_rm_force(names: list[str]) -> list[str]:
 def docker_restart(name: str) -> tuple[int, str]:
     try:
         p = subprocess.run(
-            ["docker", "restart", name],
+            [_docker_bin(), "restart", name],
             check=False,
             capture_output=True,
             text=True,

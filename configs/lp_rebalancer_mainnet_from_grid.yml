@@ -1,0 +1,20 @@
+# RESEARCH promote from synthetic zipline/pandas grid (NOT live).
+# Source: data/param_grid_results.json / data/last_backtest.json
+# Live T015 still uses configs/lp_rebalancer_mainnet_smoke.yml (width 1.0 / thr 0.05).
+# Re-run grid on real 1m SOL-USDC CSV before adopting live.
+
+id: orca_tight_mainnet_from_grid
+controller_name: lp_rebalancer
+controller_type: generic
+connector_name: solana-mainnet-beta
+lp_provider: orca/clmm
+trading_pair: SOL-USDC
+pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"
+total_amount_quote: 800
+side: RANGE
+position_width_pct: 0.5
+position_offset_pct: -0.01
+rebalance_threshold_pct: 0.05
+autoswap: true
+swap_buffer_pct: 0.01
+manual_kill_switch: false

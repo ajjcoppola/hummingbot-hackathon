@@ -186,13 +186,13 @@ def main() -> int:
     parser.add_argument("--width", type=Decimal, default=Decimal("1.5"))
     parser.add_argument("--trigger", type=Decimal, default=Decimal("0.8"))
     parser.add_argument("--skew", type=Decimal, default=Decimal("0.6"))
+    parser.add_argument(
+        "--grid",
+        action="store_true",
+        help="Sweep width×trigger grid; write data/param_grid_results.json + promote best net",
+    )
     args = parser.parse_args()
 
-    params = Params(
-        range_width_pct=args.width,
-        rebalance_trigger_pct=args.trigger,
-        skew_bias=args.skew,
-    )
     if args.csv is None:
         # Synthetic 48h of 1m bars: slow drift + one flush, for a dry run.
         price = Decimal("150")
@@ -206,6 +206,43 @@ def main() -> int:
     else:
         bars = load_csv(args.csv)
 
+    if args.grid:
+        widths = [Decimal("0.5"), Decimal("1.0"), Decimal("1.5"), Decimal("2.0")]
+        triggers = [Decimal("0.05"), Decimal("0.2"), Decimal("0.8")]
+        rows = []
+        for w in widths:
+            for t in triggers:
+                params = Params(
+                    range_width_pct=w,
+                    rebalance_trigger_pct=t,
+                    skew_bias=args.skew,
+                )
+                result = simulate(bars, params)
+                rows.append(asdict(result))
+        rows.sort(key=lambda r: r["net_usdc"], reverse=True)
+        grid_path = ROOT / "data" / "param_grid_results.json"
+        grid_path.parent.mkdir(parents=True, exist_ok=True)
+        grid_path.write_text(json.dumps({"rows": rows, "best": rows[0]}, indent=2) + "\n")
+        write_params_json(
+            BacktestResult(**{k: rows[0][k] for k in asdict(simulate(bars, Params())).keys()}),
+            args.out,
+        )
+        # Re-simulate best for typed write
+        best_p = Params(
+            range_width_pct=Decimal(str(rows[0]["params"]["range_width_pct"])),
+            rebalance_trigger_pct=Decimal(str(rows[0]["params"]["rebalance_trigger_pct"])),
+            skew_bias=Decimal(str(rows[0]["params"]["skew_bias"])),
+        )
+        best = simulate(bars, best_p)
+        write_params_json(best, args.out)
+        print(json.dumps({"best": asdict(best), "n_grid": len(rows), "grid_path": str(grid_path)}, indent=2))
+        return 0
+
+    params = Params(
+        range_width_pct=args.width,
+        rebalance_trigger_pct=args.trigger,
+        skew_bias=args.skew,
+    )
     result = simulate(bars, params)
     write_params_json(result, args.out)
     print(json.dumps(asdict(result), indent=2))
