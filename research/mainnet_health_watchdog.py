@@ -4,19 +4,16 @@
 Unlike research/devnet_watchdog.py this script:
   - NEVER auto-deploys Devnet bots
   - NEVER opens a second LP while one is still open (except via adopt --recycle)
-  - Restarts Gateway on repeated position-info failures
+  - Restarts Gateway on repeated position-info failures (with cooldown)
   - Soft-restarts only for mild OOR (inside limit-price hysteresis)
   - Auto adopt --recycle when past auto-close limits (stranded LP after FAILED close)
-  - Hard-restart when one bot is running and no LP is open (dust-swap flat loop)
+  - Hard-restart when a bot is running and LP is *confirmed* gone (anti false-flat)
   - Optionally restarts the endurance reporter if its log goes stale
 
-Why soft-restart is not enough for "stuck OOR":
-  Official lp_rebalancer auto-closes via LPExecutor limit prices. If Gateway
-  close returns SIMULATION_FAILED (non-retryable), the executor dies FAILED
-  while the on-chain LP remains. The controller then HALTS new opens until
-  manual recovery. Soft-restart clears the halt but cannot attach the orphan;
-  it tries a second OPEN → INSUFFICIENT_BALANCE. Fix: Gateway close + redeploy
-  (adopt --recycle).
+Anti-flake (R003m postmortem 2026-09-29):
+  RPC/Gateway often returns n_positions=0 while the LP is still open. We keep a
+  sticky last-known position address and re-probe it before counting a flat poll
+  or restarting Gateway / hard-restarting the bot.
 
 Auth: HB_API_USER / HB_API_PASS. LLM does not place LP.
 """
@@ -44,7 +41,9 @@ from mainnet_lib import (  # noqa: E402
     bot_status,
     docker_restart,
     gateway_status,
+    mainnet_balances,
     matching_bots,
+    portfolio_state,
     position_info,
     positions_owned,
     restart_gateway,
@@ -56,6 +55,36 @@ def append_jsonl(path: Path, row: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, default=str) + "\n")
+
+
+STATE_PATH = ROOT / "data" / "mainnet_watchdog" / "watchdog_state.json"
+
+
+def load_persisted_state() -> dict[str, Any]:
+    if not STATE_PATH.exists():
+        return {}
+    try:
+        data = json.loads(STATE_PATH.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def save_persisted_state(state: dict[str, Any]) -> None:
+    """Persist sticky LP + cooldowns so a LaunchAgent restart does not forget the open position."""
+    keep = {
+        "sticky_addr": state.get("sticky_addr"),
+        "sticky_seen_ts": state.get("sticky_seen_ts"),
+        "last_gateway_restart_ts": state.get("last_gateway_restart_ts"),
+        "last_flat_restart_ts": state.get("last_flat_restart_ts"),
+        "last_recycle_ts": state.get("last_recycle_ts"),
+        "last_soft_restart_ts": state.get("last_soft_restart_ts"),
+        "last_pool": state.get("last_pool"),
+        "pool_switch_timestamps": state.get("pool_switch_timestamps") or [],
+        "pool_switch": state.get("pool_switch", 0),
+    }
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATE_PATH.write_text(json.dumps(keep, indent=2), encoding="utf-8")
 
 
 def reporter_stale(run_id: str, max_age_s: int) -> bool:
@@ -87,15 +116,157 @@ def flat_restart_decision(
     flat_streak: int,
     flat_polls: int,
     cooldown_active: bool,
+    confirmed_flat: bool = True,
 ) -> str:
     """Action name when a bot is up and the wallet has no LP. Empty string otherwise."""
     if n_running != 1 or n_pos != 0:
         return ""
+    if not confirmed_flat:
+        return "rpc_flake_hold"
     if flat_streak < flat_polls:
         return "watching_flat"
     if cooldown_active:
         return "flat_restart_cooldown"
     return "flat_hard_restart"
+
+
+def positions_owned_stable(
+    client: ApiClient,
+    *,
+    network: str,
+    pool: str,
+    wallet: str,
+    attempts: int = 3,
+    delay_s: float = 2.0,
+) -> tuple[list[dict], str]:
+    """Retry positions_owned; return first non-empty, else empty after all attempts."""
+    last: list[dict] = []
+    errors: list[str] = []
+    for i in range(max(1, attempts)):
+        try:
+            last = positions_owned(client, network=network, pool=pool, wallet=wallet)
+            if last:
+                return last, f"ok_attempt_{i+1}"
+        except Exception as e:
+            errors.append(str(e)[:120])
+            last = []
+        if i + 1 < attempts:
+            time.sleep(delay_s)
+    if errors and not last:
+        return [], "errors:" + "|".join(errors)[:200]
+    return last, f"empty_after_{attempts}"
+
+
+def probe_sticky_alive(
+    client: ApiClient,
+    *,
+    network: str,
+    sticky_addr: Optional[str],
+) -> tuple[str, Optional[dict]]:
+    """Check sticky position. Returns (status, info).
+
+    status: alive | gone | unknown
+    """
+    if not sticky_addr:
+        return "gone", None
+    try:
+        info = position_info(client, network=network, position_address=sticky_addr)
+    except Exception:
+        return "unknown", None
+    if info is None:
+        return "gone", None
+    # Any successful info payload means the NFT/account still resolves.
+    return "alive", info if isinstance(info, dict) else {"raw": True}
+
+
+def free_usdc_units(client: ApiClient) -> Optional[float]:
+    try:
+        pf = portfolio_state(client)
+        bals = mainnet_balances(pf)
+        for b in bals:
+            if (b.get("token") or "").upper() == "USDC":
+                return float(b.get("units") or 0)
+    except Exception:
+        return None
+    return None
+
+
+def whirlpool_liquidity(position_address: str) -> Optional[int]:
+    """Public-RPC Whirlpool liquidity. None=account gone; -1=RPC error."""
+    import base64
+    import struct
+    import urllib.request
+
+    body = json.dumps(
+        {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "getAccountInfo",
+            "params": [position_address, {"encoding": "base64"}],
+        }
+    ).encode()
+    req = urllib.request.Request(
+        "https://api.mainnet-beta.solana.com",
+        data=body,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            val = json.load(resp)["result"]["value"]
+    except Exception:
+        return -1
+    if val is None:
+        return None
+    raw = base64.b64decode(val["data"][0])
+    if len(raw) < 88:
+        return -1
+    lo, hi = struct.unpack_from("<QQ", raw, 72)
+    return int(lo | (hi << 64))
+
+
+def confirm_flat(
+    client: ApiClient,
+    *,
+    network: str,
+    pool: str,
+    wallet: str,
+    sticky_addr: Optional[str],
+    min_free_usdc: float,
+) -> tuple[bool, str, list[dict]]:
+    """True only when we believe the LP is really gone.
+
+    Requires: stable empty positions_owned AND sticky probe not alive.
+    If sticky is unknown (RPC error), refuse to confirm (prevents false flat).
+    When Gateway says sticky is gone, verify on-chain Whirlpool liquidity
+    (Gateway 404'd Ee7c… while liquidity>0 under Helius 429).
+    """
+    pos, how = positions_owned_stable(client, network=network, pool=pool, wallet=wallet)
+    if pos:
+        return False, f"positions_visible:{how}", pos
+
+    sticky_status, _info = probe_sticky_alive(client, network=network, sticky_addr=sticky_addr)
+    if sticky_status == "alive":
+        return False, "sticky_still_alive", []
+    if sticky_status == "unknown":
+        return False, "sticky_probe_unknown_rpc", []
+
+    if sticky_addr:
+        onchain = whirlpool_liquidity(sticky_addr)
+        if onchain is not None and onchain < 0:
+            return False, "sticky_onchain_rpc_error", []
+        if onchain is not None and onchain > 0:
+            return False, f"sticky_onchain_liq={onchain}", []
+        # onchain None (account gone) or 0 liquidity — confirmed flat
+        usdc = free_usdc_units(client)
+        return True, f"sticky_onchain_gone_usdc={usdc}", []
+
+    # No sticky ever: require free USDC evidence so we don't nuke a brand-new open
+    usdc = free_usdc_units(client)
+    if usdc is None:
+        return False, "no_sticky_and_portfolio_unknown", []
+    if usdc < min_free_usdc:
+        return False, f"no_sticky_and_usdc_low={usdc:.4f}", []
+    return True, f"no_sticky_usdc_ok={usdc:.4f}", []
 
 
 def adopt_recycle(*, restart_gateway_flag: bool = True) -> dict[str, Any]:
@@ -189,14 +360,28 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
         append_jsonl(log_path, row)
         return row
 
-    pos = positions_owned(client, network=args.network, pool=args.pool, wallet=args.wallet)
+    pos, pos_how = positions_owned_stable(
+        client,
+        network=args.network,
+        pool=args.pool,
+        wallet=args.wallet,
+        attempts=args.pos_retries,
+        delay_s=args.pos_retry_delay_s,
+    )
+    row["positions_probe"] = pos_how
     row["n_positions"] = len(pos)
     row["in_range"] = [p.get("in_range") for p in pos]
     row["addresses"] = [p.get("position_address") for p in pos]
     row["watch_pool"] = args.pool
+    row["sticky_addr"] = (state.get("sticky_addr") or "")[:16] or None
 
-    # Pool-switch counter (48h rolling). Seeded by args.pool changes and optional
-    # switch log written by the dynamic farmer.
+    # Update sticky last-known LP
+    if len(pos) == 1 and pos[0].get("position_address"):
+        state["sticky_addr"] = pos[0]["position_address"]
+        state["sticky_seen_ts"] = time.time()
+    row["sticky_addr"] = (state.get("sticky_addr") or "")[:16] or None
+
+    # Pool-switch counter (48h rolling).
     switch_ts: list[float] = list(state.get("pool_switch_timestamps") or [])
     switch_log = ROOT / "data" / "mainnet_watchdog" / "pool_switches.jsonl"
     if switch_log.exists():
@@ -261,20 +446,58 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
     else:
         state["past_limit_streak"] = 0
 
+    # Flat confirmation (anti false-flat)
+    confirmed_flat = False
+    flat_reason = ""
     if len(running) == 1 and len(pos) == 0:
-        state["flat_streak"] = state.get("flat_streak", 0) + 1
+        confirmed_flat, flat_reason, recovered = confirm_flat(
+            client,
+            network=args.network,
+            pool=args.pool,
+            wallet=args.wallet,
+            sticky_addr=state.get("sticky_addr"),
+            min_free_usdc=args.min_free_usdc_flat,
+        )
+        row["flat_confirm"] = flat_reason
+        if recovered:
+            pos = recovered
+            row["n_positions"] = len(pos)
+            row["in_range"] = [p.get("in_range") for p in pos]
+            row["addresses"] = [p.get("position_address") for p in pos]
+            if len(pos) == 1 and pos[0].get("position_address"):
+                state["sticky_addr"] = pos[0]["position_address"]
+                state["sticky_seen_ts"] = time.time()
+            confirmed_flat = False
+            flat_reason = "recovered_on_confirm"
+            row["flat_confirm"] = flat_reason
+            state["flat_streak"] = 0
+        elif confirmed_flat:
+            state["flat_streak"] = state.get("flat_streak", 0) + 1
+        else:
+            # RPC flake — do not advance flat_streak toward hard-restart
+            state["flat_streak"] = 0
     else:
         state["flat_streak"] = 0
+        if len(pos) >= 1:
+            # clear sticky death path
+            pass
 
     row["oor_streak"] = state["oor_streak"]
     row["past_limit_streak"] = state["past_limit_streak"]
     row["info_fail_streak"] = state["info_fail_streak"]
     row["flat_streak"] = state["flat_streak"]
+    row["confirmed_flat"] = confirmed_flat
+
+    gw_cooldown = (time.time() - (state.get("last_gateway_restart_ts") or 0)) < args.gateway_restart_cooldown_s
 
     if not row["gateway_running"]:
         row["action"] = "alert_gateway_down"
         row["detail"] = "gateway not running"
-    elif state["info_fail_streak"] >= args.info_fail_limit:
+    elif (
+        state["info_fail_streak"] >= args.info_fail_limit
+        and len(pos) == 1  # only bounce gateway when we still see an LP
+        and not gw_cooldown
+    ):
         if args.dry_run:
             row["action"] = "would_restart_gateway"
         else:
@@ -284,14 +507,26 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
                 row["detail"] = f"after {state['info_fail_streak']} position-info failures"
                 state["info_fail_streak"] = 0
                 state["last_gateway_restart"] = utc_now()
+                state["last_gateway_restart_ts"] = time.time()
             except Exception as e:
                 row["action"] = "error"
                 row["detail"] = f"gateway restart failed: {e}"
+    elif state["info_fail_streak"] >= args.info_fail_limit and gw_cooldown:
+        row["action"] = "gateway_restart_cooldown"
+        row["detail"] = f"info_fail={state['info_fail_streak']} but gateway cooldown active"
     elif len(running) == 0 and len(pos) == 0:
-        row["action"] = "alert_flat_no_bot"
-        row["detail"] = "no bot and no LP — run: python3 scripts/mainnet_bot_ops.py hard-restart"
+        # Confirm before screaming — sticky may still be alive
+        sticky_status, _ = probe_sticky_alive(
+            client, network=args.network, sticky_addr=state.get("sticky_addr")
+        )
+        if sticky_status == "alive":
+            row["action"] = "rpc_flake_hold"
+            row["detail"] = "no bot listed but sticky LP still alive — do not hard-restart"
+        else:
+            row["action"] = "alert_flat_no_bot"
+            row["detail"] = "no bot and no LP — run: python3 scripts/mainnet_bot_ops.py hard-restart"
     elif len(pos) == 1 and (
-        (len(running) == 0)  # orphan LP — recycle (was alert-only; stranded T014 for hours)
+        (len(running) == 0)  # orphan LP
         or (past and state["past_limit_streak"] >= args.past_limit_polls)
     ):
         reason = past_detail if past else "orphan_lp_no_running_bot"
@@ -333,6 +568,7 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
                     }
             else:
                 state["recycle_fail_streak"] = 0
+                state["sticky_addr"] = None
                 if args.reporter_run_id:
                     row["reporter"] = restart_reporter(args.reporter_run_id)
     elif oor and not past and state["oor_streak"] >= args.oor_limit and running:
@@ -358,18 +594,23 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
             flat_streak=state["flat_streak"],
             flat_polls=args.flat_polls,
             cooldown_active=cooldown_active,
+            confirmed_flat=confirmed_flat,
         )
         row["action"] = decision
-        row["detail"] = f"running bot, 0 LP, streak {state['flat_streak']}/{args.flat_polls}"
+        row["detail"] = (
+            f"running bot, 0 LP, streak {state['flat_streak']}/{args.flat_polls}, "
+            f"confirm={flat_reason or confirmed_flat}"
+        )
         if decision == "flat_hard_restart":
             if args.dry_run:
                 row["action"] = "would_flat_hard_restart"
             else:
                 result = flat_hard_restart()
                 code = (result or {}).get("code", 1)
-                row["detail"] = {"streak": state["flat_streak"], "result": result}
+                row["detail"] = {"streak": state["flat_streak"], "confirm": flat_reason, "result": result}
                 state["last_flat_restart_ts"] = time.time()
                 state["flat_streak"] = 0
+                state["sticky_addr"] = None
                 if code != 0:
                     row["action"] = "flat_hard_restart_failed"
                 elif args.reporter_run_id:
@@ -404,7 +645,18 @@ def main() -> int:
     p.add_argument("--interval", type=int, default=120)
     p.add_argument("--once", action="store_true")
     p.add_argument("--dry-run", action="store_true")
-    p.add_argument("--info-fail-limit", type=int, default=3)
+    p.add_argument(
+        "--info-fail-limit",
+        type=int,
+        default=8,
+        help="Gateway restart only after N position-info fails WHILE LP is visible",
+    )
+    p.add_argument(
+        "--gateway-restart-cooldown-s",
+        type=int,
+        default=1800,
+        help="Min seconds between Gateway restarts (anti-flap)",
+    )
     p.add_argument("--oor-limit", type=int, default=3, help="Soft-restart after N mild-OOR polls")
     p.add_argument(
         "--past-limit-polls",
@@ -423,14 +675,22 @@ def main() -> int:
     p.add_argument(
         "--flat-polls",
         type=int,
-        default=3,
-        help="Hard-restart after N polls with one running bot and zero LP",
+        default=8,
+        help="Confirmed-flat polls required before hard-restart (~16m at 120s)",
     )
     p.add_argument(
         "--flat-restart-cooldown-s",
         type=int,
-        default=1200,
+        default=3600,
         help="Minimum seconds between flat hard-restarts",
+    )
+    p.add_argument("--pos-retries", type=int, default=3, help="positions_owned retries per poll")
+    p.add_argument("--pos-retry-delay-s", type=float, default=2.0)
+    p.add_argument(
+        "--min-free-usdc-flat",
+        type=float,
+        default=40.0,
+        help="When no sticky addr, require this free USDC before confirming flat",
     )
     p.add_argument(
         "--recycle-fail-alert",
@@ -440,14 +700,24 @@ def main() -> int:
     )
     p.add_argument("--reporter-run-id", default="")
     p.add_argument("--reporter-stale-s", type=int, default=600)
+    p.add_argument(
+        "--seed-sticky",
+        default="",
+        help="Optional last-known LP address if state file is empty (orphan recovery)",
+    )
     args = p.parse_args()
 
     log_path = ROOT / "data" / "mainnet_watchdog" / "watchdog.jsonl"
-    state: dict[str, Any] = {}
+    state: dict[str, Any] = load_persisted_state()
+    # Seed sticky from known R003m LP if empty (account may still hold capital while RPC is blind)
+    if not state.get("sticky_addr") and args.seed_sticky:
+        state["sticky_addr"] = args.seed_sticky
+        state["sticky_seen_ts"] = time.time()
 
     while True:
         try:
             row = check_once(args, state, log_path)
+            save_persisted_state(state)
             print(json.dumps(row))
         except Exception as e:
             err = {"ts": utc_now(), "action": "error", "detail": str(e)}

@@ -21,10 +21,15 @@ Before you leave the laptop for multi-day runs:
 3. Fresh heartbeats (age &lt; 5 min):
    ```bash
    tail -1 data/mainnet_watchdog/watchdog.jsonl
-   tail -2 data/devnet_runs/T014_mainnet_100_hb217_20260926.reporter.log
+   tail -2 data/devnet_runs/R003m_mainnet_100_w16_20260928.reporter.log
    ```
 4. `python3 scripts/mainnet_bot_ops.py status` → `ok: true`, one bot, one in-range LP.
 5. Confirm images: `docker ps` shows `hummingbot:version-2.17.0` and `gateway:version-2.17.0`.
+6. If free wallet looks empty but capital should be in LP: decode Whirlpool liquidity (do **not** trust Gateway `positions_owned` under Helius 429). Orphan recovery:
+   ```bash
+   python3 scripts/mainnet_bot_ops.py --wait-s 420 adopt --recycle --restart-gateway \
+     --force-position Ee7cQUz3w3ayY8VTsH7fL9z9f21uSXCAkUYR7rLggMFy
+   ```
 
 Do **not** start watchdog/reporter from Cursor agent shells (`python … &`). Use LaunchAgents only.
 
@@ -86,19 +91,29 @@ python3 scripts/mainnet_bot_ops.py status
 # 5) Never soft-restart expecting a rebalance; never hard-restart with LP open
 ```
 
+## RPC (blocking for 48h)
+
+Helius free tier hit **max usage** during R003m (zombie bot balance spam + false-flat restarts). Gateway `conf/chains/solana.yml` `rpcProvider: helius` **overrides** `mainnet-beta.yml` `nodeURL` — switching only `nodeURL` does nothing.
+
+**Current recovery mode:** `rpcProvider: url` + public `https://api.mainnet-beta.solana.com`. Public RPC also 429s under burst; for a flake-free 48h prefer a paid Solana RPC (Helius paid / Alchemy / QuickNode), set `rpcProvider: url` and that `nodeURL`, restart Gateway. Re-enable `rpcProvider: helius` only after quota resets.
+
 ## Health watchdog behavior
 
 | Condition | Action |
 |-----------|--------|
-| `position_info` fails N times | Restart Gateway |
+| `position_info` fails N times **while LP is visible** | Restart Gateway (**30m cooldown**; default `--info-fail-limit 8`) |
 | Mild OOR (spot still inside limit hysteresis) | Soft-restart bot (cooldown) |
 | Spot **past** auto-close limits for N polls | **`adopt --recycle`** |
 | **Orphan LP** (bot down, 1 position) | **`adopt --recycle`** (not alert-only — T014 lesson) |
 | Recycle fails N times | `alert_recycle_failed` — manual intervene |
+| Bot running + **confirmed** flat (sticky LP gone + retries empty) for `--flat-polls` (default 8 ≈16m) | **`flat_hard_restart`** (1h cooldown) |
+| Bot running + apparent flat but sticky LP still alive / RPC unknown | **`rpc_flake_hold`** — do **not** restart (R003m false-flat 2026-09-29) |
 | Reporter snapshots stale | `restart-reporter` |
 | Multiple bots | **Alert only** |
 
 Never auto-deploys Devnet. Never opens a second LP without closing the first.
+
+**Anti-flake (required for 48h):** sticky last-known position address; `positions_owned` retries; Gateway restart only when an LP is still listed. Keep Amphetamine indefinite — sleep alone did not kill R003m, but gateway timeouts after sleep make flakes worse.
 
 ## Stuck OOR past limit (root cause)
 

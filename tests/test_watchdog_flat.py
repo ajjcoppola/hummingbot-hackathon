@@ -35,3 +35,25 @@ def test_no_bot_is_not_this_branch():
     assert flat_restart_decision(
         n_running=0, n_pos=0, flat_streak=5, flat_polls=3, cooldown_active=False
     ) == ""
+
+
+def test_unconfirmed_flat_holds_even_at_threshold():
+    assert flat_restart_decision(
+        n_running=1,
+        n_pos=0,
+        flat_streak=8,
+        flat_polls=3,
+        cooldown_active=False,
+        confirmed_flat=False,
+    ) == "rpc_flake_hold"
+
+
+def test_confirmed_flat_still_hard_restarts():
+    assert flat_restart_decision(
+        n_running=1,
+        n_pos=0,
+        flat_streak=8,
+        flat_polls=8,
+        cooldown_active=False,
+        confirmed_flat=True,
+    ) == "flat_hard_restart"

@@ -1,23 +1,74 @@
-# Simulation results (application pack)
+# Tags
 
-**Capital start:** $800 · **Pool:** Orca SOL/USDC `Czfq3xZZ…` · **Candles:** Gecko hourly 2026-09-07 → 2026-09-28 · **Path:** 1× share, high–low intra-hour.
+`market-making` `lp` `orca` `solana` `gateway` `whirlpools` `clmm` `simulation`
 
-## No-loss gate (hard)
+## Exchanges
 
-A config **fails** if `end_equity < $800` (finished below start). Losing money in simulation is a **no-go**.
+Orca (primary). Eligible venue: Solana.
 
-| Config | Train PnL vs $800 | Holdout PnL vs $800 | vs HODL (hold) | Verdict |
-|--------|-------------------:|--------------------:|---------------:|---------|
-| Tight live **1.0 / 0.05** (rejected) | — (full-span) | **−$557** (`$243`) | −$615 | **NO-GO** |
-| **sit_wide 16%** (open once) | **+$29** | **+$25** | −$3.8 | **PASS** both windows |
-| **lp_rebalancer 16 / 0.5** (race YAML) | −$48 | **+$24** | −$4.4 | Holdout **PASS**; train lost after one recenter into rally |
-| R003 Czfq sit-wide holdout | — | **+$30** | **+$9** | **PASS** (constant-TVL caveat) |
+## Description
 
-## Why this might work
+This agent holds **one** concentrated SOL/USDC position on Orca Whirlpool `Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE` (0.04% fee). Execution is official Hummingbot V2 `lp_rebalancer` + Gateway `orca/clmm`.
 
-1. The old tight band **destroys capital** in the same candle set ($800 → $243, 1,224 rebals) — so “just tighten more” is falsified.
-2. Wide / rare-recenter **keeps the book above $800** on the holdout week and tracks hold within a few dollars while earning ~$10–17 of fees.
-3. Among true SOL-USDC tiers (`tokensBothOf`), only Czfq clears TVL ≥ $500k (R003) — intensity shopping does not unlock a free higher-fee pool for $800.
+### Simulation gate (required)
+
+Losing money in simulation is a **no-go**. Same Gecko hourly path, $800 start, 1× share:
+
+
+| Config                   | Holdout end | PnL vs $800            | Verdict                               |
+| ------------------------ | ----------- | ---------------------- | ------------------------------------- |
+| Old tight **1.0 / 0.05** | $243        | **−$557**              | **NO-GO** (1,224 rebals)              |
+| **sit_wide 16%**         | $825        | **+$25** (train +$29)  | **PASS** both windows                 |
+| Race **16% / 0.5**       | $824        | **+$24**               | Holdout PASS (near sit-wide; 1 rebal) |
+| R003 Czfq holdout        | $830        | **+$30** (+$9 vs HODL) | PASS (constant-TVL caveat)            |
+
+
+Full grid (310 train configs), no-loss survivors, curves, and ML shadow status: `submission/simulations/`.
+
+### Thesis
+
+Tightening a CLMM band scales fees and loss-versus-rebalancing together — not free leverage. Wide band + rare recenter keeps capital above start while collecting fees. True SOL-USDC tier screen (`tokensBothOf`) finds only Czfq above $500k TVL for an $800 deposit. Botcamp **Volume (40%)** = traded volume implied by **fees earned** (not own open/close swaps).
+
+### Live
+
+Proof run **R003m** ($100, 16/0.5) started 2026-09-28 after cancelling tight-band T016. No unfinished-clock P&L claimed. Race capital on Botcamp is $800 (`configs/lp_rebalancer_race_800.yml`).
+
+LLM never places or cancels LP.
+
+## Markets
+
+- Orca Whirlpools via Gateway `orca/clmm`
+- SOL/USDC on `Czfq3xZZ…` (0.04%)
+- `solana-mainnet-beta`
+- Not used: Binance Global, Gate, Bitget, Hyperliquid, Derive
+
+
+
+## Parameters
+
+
+| Parameter                 | Race value | Note                     |
+| ------------------------- | ---------- | ------------------------ |
+| `position_width_pct`      | 16.0       | Full band (~±8%)         |
+| `rebalance_threshold_pct` | 0.5        | Rare recenter ≈ sit_wide |
+| `total_amount_quote`      | 800        | Botcamp custody          |
+| `autoswap`                | true       |                          |
+| `pool_address`            | Czfq3xZZ…  | Orca API only            |
+
+
+
+
+## Status
+
+Simulation pack attached. Live R003m in progress (ledger). T016 cancelled. Entry freeze 2026-10-01; race 2026-10-06.
+
+## Events
+
+Range open / hold in-band / rare rebalance past 0.5% threshold. Fee accrual drives Volume.
+
+
+
+
 
 ## Grid search (R002)
 
@@ -25,6 +76,8 @@ A config **fails** if `end_equity < $800` (finished below start). Losing money i
 - Absolute no-loss on **both** train and holdout: **3** configs (see `no_loss_gate.json`) — led by **sit_wide 16%**.
 - Holdout leaderboard (top absolute PnL): `holdout_grid_leaderboard.json`.
 - Full grid: `r002_cup_grid.json` · equity curves: `r002_curves.json`.
+
+
 
 ### Race executable (maps to sit_wide economics)
 
@@ -35,6 +88,8 @@ Official `lp_rebalancer` cannot “never rebalance”; **16% width + 0.5 thresho
 - Corrected R002’s OR-filter mislabel; true SOL-USDC universe only.
 - Hard-filter switcher stayed on Czfq (0 switches); holdout ≈ sit-wide **+$30** vs start.
 - Artifact: `r003_multi_pool.json`.
+
+
 
 ## ML intensity ranker
 
@@ -54,6 +109,8 @@ Ridge next-24h intensity model is **shadow-only** until snapshot history covers 
 - Train window for 16/0.5 lost absolute dollars after a recenter — the race relies on the threshold staying high so behavior stays near sit_wide.
 - Live proof **R003m** ($100, 16/0.5) started 2026-09-28 ~01:27Z — not a finished P&L claim.
 
+
+
 ## Reproduce
 
 ```bash
@@ -61,3 +118,4 @@ python3 research/cup_money_search.py
 python3 research/r003_multi_pool_replay.py
 python3 -c "from orca_tight_range.ml_intensity import shadow_from_log; print(shadow_from_log('data/pool_snapshots.jsonl'))"
 ```
+

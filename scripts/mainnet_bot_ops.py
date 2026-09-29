@@ -292,6 +292,40 @@ def _cleanup_prefix_bots(client: ApiClient, prefix: str) -> dict:
     return out
 
 
+def _whirlpool_liquidity(position_address: str) -> int | None:
+    """Return Whirlpool position liquidity via public Solana RPC, or None if account gone."""
+    import struct
+    import urllib.request
+
+    body = json.dumps(
+        {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "getAccountInfo",
+            "params": [position_address, {"encoding": "base64"}],
+        }
+    ).encode()
+    req = urllib.request.Request(
+        "https://api.mainnet-beta.solana.com",
+        data=body,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            val = json.load(resp)["result"]["value"]
+    except Exception:
+        return -1  # transient RPC error — treat as still open
+    if val is None:
+        return None
+    import base64 as b64
+
+    raw = b64.b64decode(val["data"][0])
+    if len(raw) < 88:
+        return -1
+    lo, hi = struct.unpack_from("<QQ", raw, 72)
+    return int(lo | (hi << 64))
+
+
 def cmd_adopt(args: argparse.Namespace) -> int:
     """Stop bots / skip deploy-open when exactly one LP exists.
 
@@ -301,10 +335,23 @@ def cmd_adopt(args: argparse.Namespace) -> int:
     client = ApiClient(args.api)
     log: dict = {"ts": utc_now(), "mode": "adopt", "deploy_skipped": True, "steps": []}
 
+    force_addr = (getattr(args, "force_position", None) or "").strip() or None
     pos = positions_owned(client, network=args.network, pool=args.pool, wallet=args.wallet)
+    # Helius 429 / Gateway flake: positions_owned empty while Whirlpool account still open
+    if force_addr and len(pos) == 0:
+        log["force_position"] = force_addr
+        pos = [{"position_address": force_addr, "in_range": None, "forced": True}]
+    elif force_addr and len(pos) == 1 and pos[0].get("position_address") != force_addr:
+        log["ok"] = False
+        log["error"] = (
+            f"--force-position disagrees with owned "
+            f"{(pos[0].get('position_address') or '')[:16]}"
+        )
+        print_json(log)
+        return 2
     if len(pos) == 0:
         log["ok"] = False
-        log["error"] = "no LP to adopt — use hard-restart for a fresh OPEN"
+        log["error"] = "no LP to adopt — use hard-restart for a fresh OPEN (or --force-position)"
         print_json(log)
         return 2
     if len(pos) > 1:
@@ -324,6 +371,7 @@ def cmd_adopt(args: argparse.Namespace) -> int:
         "upper": kept.get("upper_price"),
         "base": kept.get("base_token_amount"),
         "quote": kept.get("quote_token_amount"),
+        "forced": bool(kept.get("forced")),
     }
 
     cleanup = _cleanup_prefix_bots(client, args.prefix)
@@ -369,18 +417,23 @@ def cmd_adopt(args: argparse.Namespace) -> int:
     deadline = time.time() + args.wait_s
     flat = False
     while time.time() < deadline:
-        pos2 = positions_owned(client, network=args.network, pool=args.pool, wallet=args.wallet)
-        if len(pos2) == 0:
-            flat = True
-            break
-        # closed address gone even if list flakes
-        addrs = {p.get("position_address") for p in pos2}
-        if addr not in addrs and len(pos2) == 0:
-            flat = True
-            break
-        if addr not in addrs:
-            flat = True
-            break
+        if force_addr:
+            # Gateway position-info can 404 while liquidity remains — use public RPC.
+            onchain = _whirlpool_liquidity(addr)
+            log.setdefault("onchain_liquidity_samples", []).append(onchain)
+            if onchain is not None and onchain == 0:
+                flat = True
+                break
+            if onchain is None:
+                # account gone
+                flat = True
+                break
+        else:
+            pos2 = positions_owned(client, network=args.network, pool=args.pool, wallet=args.wallet)
+            addrs = {p.get("position_address") for p in pos2}
+            if len(pos2) == 0 or addr not in addrs:
+                flat = True
+                break
         time.sleep(3)
     log["steps"].append({"flat": flat})
     if not flat:
@@ -530,6 +583,11 @@ def main() -> int:
         "--recycle",
         action="store_true",
         help="close the existing LP then hard-restart for a clean managed OPEN",
+    )
+    sp_adopt.add_argument(
+        "--force-position",
+        default="",
+        help="known LP address when Gateway positions_owned is empty (RPC flake / 429)",
     )
     sp_adopt.add_argument("--restart-gateway", action="store_true")
     sp_adopt.add_argument("--allow-oor-ok", action="store_true")

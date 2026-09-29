@@ -1,99 +1,80 @@
-# Botcamp form paste — AGENT strategy (2026-08-27)
+# Botcamp form paste — strategy 156 (race bot 16% / 0.5)
 
-URL: https://www.botcamp.xyz/dashboard/strategies/new?type=AGENT
+URL: https://www.botcamp.xyz/dashboard/strategies/156  
+Source of truth: `submission/orca_race_case/collateral/APPLICATION.md`  
+Deadline: **EOD 2026-09-30**. Freeze 2026-10-01. Race 2026-10-06.
 
-Honest vs the early Perplexity-era blurb: **same venue and tight-range idea**; **live path is Gateway + `lp_rebalancer` / `LPExecutor` on Devnet today**; custom `decide()` policy is in-repo and unit-tested; **zipline tuning was skipped** for the freeze window (pandas/toy sim + Devnet txs instead).
-
-Copy each block below into the matching field. Leave Video Link blank until Loom/YouTube is ready.
+Copy each block into the matching field. Upload `submission/simulations/` under Code Files.
 
 ---
 
 ## Name / Title
 
 ```
-Orca Tight-Range Leverage Farmer
+Orca Wide-Band SOL/USDC Farmer
 ```
+
+*(If the portal already named this strategy “Orca Tight-Range Leverage Farmer”, keep that title and replace Summary/Description/Parameters below — do not invent a second strategy.)*
 
 ---
 
 ## Strategy Type
 
-Select: **Agent** (page already `type=AGENT`).
-
-If there is a secondary type / tag for the runnable artifact, also mark **Controller** (Hummingbot V2). Condor is harness only — LLM does not place LP.
+**Agent** / Controller (Hummingbot V2). Condor is narration only — it does not trade.
 
 ---
 
 ## Summary
 
 ```
-Wide-band Orca SOL/USDC Whirlpool LP (16% / 0.5) on Czfq3xZZ. Simulation no-loss gate: old 1% band −$557 (rejected); sit-wide 16% +$29/+$25 train/holdout; race YAML holdout +$24. Fees-implied Volume. Deterministic lp_rebalancer + Gateway; LLM does not trade. See submission/simulations/.
+Wide-band Orca SOL/USDC Whirlpool LP on Czfq3xZZ…: 16% width, 0.5 rebalance threshold. Simulation no-loss gate: old 1% band −$557 (rejected); sit-wide 16% +$29/+$25 train/holdout; race YAML 16/0.5 holdout +$24. Volume = fees-implied traded volume. Deterministic lp_rebalancer + Gateway. LLM does not trade. See submission/simulations/.
 ```
-
-*(Old summary implied zipline-validated params before live. New: Devnet open→close→reopen proven; zipline grid deferred past freeze.)*
 
 ---
 
 ## Tags
 
 ```
-market-making, lp, orca, solana, gateway, whirlpools, clmm, rebalancer
+market-making, lp, orca, solana, gateway, whirlpools, clmm, simulation
 ```
 
 ---
 
-## Exchanges / Markets (short field)
+## Exchanges
 
 ```
-Orca Whirlpools (Solana) via Hummingbot Gateway orca/clmm. Primary race pair: SOL/USDC on mainnet. Dry-run: SOL-devUSDC on solana-devnet.
-```
-
----
-
-## Description (main long field — replaces your old “Trading agent description”)
-
-```
-This agent implements an active, tight-range concentrated liquidity market making strategy on Orca Whirlpools (Solana), targeting SOL/USDC for the race and SOL–devUSDC for Gateway dry runs.
-
-Rather than a passive full-range LP, it maintains an ultra-narrow RANGE around spot (default ±1.5%) to maximize capital efficiency and fee capture per dollar. When price exits the band (beyond a rebalance threshold), the position is closed and a new tight band is opened around the updated price — turning AMM LP into active market making for a 48-hour scored window (Volume / P&L / HBOT Vote).
-
-Architecture (what is actually implemented):
-- Policy: deterministic decide() in src/orca_tight_range/logic.py (unit-tested). Events include RangeOpened, RebalanceExecuted, RebalanceDeferred (flush/exhaustion filter), RateLimited (max 6 reb/hour), StopLossTriggered (15% drawdown).
-- Execution: Hummingbot LPExecutor + Gateway lp_provider orca/clmm. Condor (/gateway, /lp, /bots, /web) is the local harness; the LLM must not place or cancel LP.
-- Unattended race path: official generic lp_rebalancer controller with position_width_pct=1.5, rebalance_threshold_pct=0.8, side=RANGE, autoswap enabled (see configs/lp_rebalancer_devnet.yml). Custom orca_tight_range controller wraps the same policy for drop-in when the bot image can import it.
-- Proven on Devnet: open → close → reopen on Whirlpool 3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt (logged in docs/TRIALS_LEDGER.md T001–T003). No fabricated mainnet P&L.
-
-US-person venue gate: Orca / Solana only. Not used: Gate, Bitget, Binance Global, Hyperliquid, Derive.
-
-Net objective for the race window: Fees − Realized IL − Gas — not long-horizon IL minimization. A ±1% band is on the order of ~200x the capital efficiency of a full-range position (“leverage” on a spot AMM without borrowing).
+Orca (primary). Eligible venue: Solana.
 ```
 
 ---
 
-## Markets (long / structured field if separate)
+## Description
 
 ```
-- Venue: Orca Whirlpools (CLMM) via Hummingbot Gateway (`lp_provider: orca/clmm`)
-- Race network: solana-mainnet-beta — pair SOL/USDC (prefer deep fee tier; confirm pool_address before freeze)
-- Dry-run network: solana-devnet — pair SOL-devUSDC — pool 3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt (~0.20%)
-- Executor: Hummingbot LPExecutor; controller: lp_rebalancer (official) / orca_tight_range (policy wrapper)
-- Research-only (no execution): optional OHLCV for offline sims; zipline parameter grid deferred — not blocking submission
-- Forbidden for this entry (US ToS): Binance Global, Gate, Bitget, Hyperliquid, Derive
+This agent holds one concentrated SOL/USDC position on Orca Whirlpool Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE (0.04% fee). Execution is official Hummingbot V2 lp_rebalancer + Gateway orca/clmm.
+
+Simulation gate (required): Losing money in simulation is a no-go. Same Gecko hourly path, $800 start, 1× share:
+- Old tight 1.0/0.05 → holdout $243 (−$557) — NO-GO (1,224 rebals)
+- sit_wide 16% → train +$29 / holdout +$25 — PASS both windows
+- Race 16%/0.5 → holdout $824 (+$24), 1 rebal, fees ~$13 — Holdout PASS
+- R003 Czfq holdout → $830 (+$30, +$9 vs HODL) — PASS (constant-TVL caveat)
+
+Full grid (310 train configs), no-loss survivors, curves, ML shadow status: submission/simulations/.
+
+Thesis: Tightening a CLMM band scales fees and loss-versus-rebalancing together — not free leverage. Wide band + rare recenter keeps capital above start while collecting fees. True SOL-USDC tier screen (tokensBothOf) finds only Czfq above $500k TVL for an $800 deposit. Botcamp Volume (40%) = traded volume implied by fees earned (not own open/close swaps).
+
+Live: Proof run R003m ($100, 16/0.5) started 2026-09-28 after cancelling tight-band T016. No unfinished-clock P&L claimed. Race capital on Botcamp is $800 (configs/lp_rebalancer_race_800.yml). LLM never places or cancels LP.
 ```
 
 ---
 
-## What makes this unique (if the form has this field — else fold into Description)
+## Markets
 
 ```
-Most LP bots optimize for long-horizon IL via wide ranges. This entry is optimized for Botcamp’s short evaluation window: tight ±1–2% Whirlpool bands, unattended close/reopen via Gateway, and race scoring (fee/volume throughput over multi-week IL minimization).
-
-vs a generic “passive LP” bot:
-1) Active recenter when out of range (not set-and-forget).
-2) Deterministic risk guards in policy code (exhaustion defer, gas cap, 15% kill-switch) — not LLM discretion on orders.
-3) Same stack Orca sponsors (Gateway orca/clmm + LPExecutor), with a Devnet open/close/reopen already on-chain before freeze.
-
-Honesty note: early materials mentioned zipline-reloaded validation before live; for the Aug 31 freeze we shipped unit-tested policy + Devnet Gateway txs and kept official lp_rebalancer as the runnable unattended path. Offline zipline remains optional research, not a claim of live edge.
+- Orca Whirlpools via Gateway orca/clmm
+- SOL/USDC on Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE (0.04%)
+- solana-mainnet-beta
+- Not used: Binance Global, Gate, Bitget, Hyperliquid, Derive
 ```
 
 ---
@@ -101,20 +82,13 @@ Honesty note: early materials mentioned zipline-reloaded validation before live;
 ## Parameters
 
 ```
-| Parameter | Default | Live / Devnet mapping | Description |
-|---|---|---|---|
-| range_width_pct / position_width_pct | 1.5 | lp_rebalancer + logic.Params | Half-width of band around spot (±1.5%) |
-| rebalance_trigger_pct / rebalance_threshold_pct | 0.8 | same | Min move beyond band before close/reopen |
-| skew_bias | 0.6 | logic.Params (custom controller) | Momentum skew; 0.5 = symmetric |
-| volatility_exhaustion_window_s | 300 | logic.Params | Flush filter lookback |
-| max_rebalances_per_hour | 6 | logic.Params | Gas / MEV cap |
-| stop_loss_drawdown_pct | 15 | logic.Params / bot drawdown | Hard halt |
-| capital_allocation_usdc / total_amount_quote | 800 race / 20 Devnet | Botcamp $800 finals; tiny Devnet size | Quote notional |
-| side | RANGE | lp_rebalancer | Double-sided in-band LP |
-| position_offset_pct | -0.01 | Devnet YAML | Slight in-range offset; autoswap fills deficit |
-| autoswap | true | Devnet YAML | Swap via network swapProvider when unbalanced |
-| lp_provider | orca/clmm | required | Orca Whirlpools |
-| connector_name | solana-devnet (dry) / solana-mainnet-beta (race) | Gateway network id | Not the DEX name |
+| Parameter | Race value | Note |
+| --- | --- | --- |
+| position_width_pct | 16.0 | Full band (~±8%) |
+| rebalance_threshold_pct | 0.5 | Rare recenter ≈ sit_wide |
+| total_amount_quote | 800 | Botcamp custody |
+| autoswap | true | |
+| pool_address | Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE | Orca API only |
 ```
 
 ---
@@ -122,7 +96,7 @@ Honesty note: early materials mentioned zipline-reloaded validation before live;
 ## Status
 
 ```
-Devnet Gateway loop proven (open → close → reopen on Orca SOL–devUSDC; TRIALS_LEDGER T001–T003). Unattended path: official lp_rebalancer + orca/clmm; custom orca_tight_range policy shares width/trigger defaults and is unit-tested. Code freeze 2026-08-31. No live mainnet P&L claimed.
+Simulation pack attached under Code Files (submission/simulations/). Live R003m proof ($100, 16/0.5) after cancelling T016. No unfinished-clock P&L claimed. Entry freeze 2026-10-01; race 2026-10-06.
 ```
 
 ---
@@ -130,13 +104,7 @@ Devnet Gateway loop proven (open → close → reopen on Orca SOL–devUSDC; TRI
 ## Events
 
 ```
-- RangeOpened — new Whirlpool position (center, tick bounds)
-- RangeExited — price left the band; evaluate rebalance
-- RebalanceExecuted — old position closed, new tight band opened
-- RebalanceDeferred — exhaustion filter blocked a flush recenter
-- RateLimited — gas cap (max rebalances/hour) hit
-- StopLossTriggered — 15% drawdown; agent halted
-- Hold — in-range; collect fees
+Range open / hold in-band / rare rebalance when spot moves >0.5% past band edge. Fee accrual drives Volume (fees-implied traded volume).
 ```
 
 ---
@@ -147,39 +115,17 @@ Devnet Gateway loop proven (open → close → reopen on Orca SOL–devUSDC; TRI
 https://www.loom.com/share/687d7c1047534d259b19a4807ea0ef61
 ```
 
-Images: upload PNGs from `submission/images/` (architecture, decision loop, venue/wallets).
+Re-record if the Loom still sells ±1.5% / “200× leverage”. Race chart image: `submission/orca_race_case/images/orca-race-case.png`.
 
 ---
 
-## Code / attachments (upload checklist)
+## Code / attachments checklist
 
-Upload `submission/botcamp_code_upload.zip`, which includes:
-
-- `submission/strategy.md`
-- `src/orca_tight_range/logic.py`
-- `controllers/orca_tight_range_controller.py`
-- `configs/lp_rebalancer_devnet.yml`
-- `docs/INSTALL_PLAN.md`
-- `docs/TRIALS_LEDGER.md`
-- `research/orca_backtest_zipline.py` + `zipline_to_gateway_bridge.py`
-
----
-
-## Team ranking (hackathon application, if separate from this form)
-
-```
-1. Orca
-2. Meteora (same Gateway / Solana LP path if Orca seats fill)
-```
-
----
-
-## Diff vs your old Botcamp blurb (one glance)
-
-| Old claim | Now |
-|---|---|
-| Tight ±1–2% Orca SOL/USDC | Same intent; Devnet uses SOL-devUSDC pool `3KBZiL2…` |
-| Directional skew + active recenter | Policy in `logic.py`; live unattended = `lp_rebalancer` RANGE + threshold 0.8 |
-| Zipline-validated before live | Skipped for time; unit tests + Devnet txs are the evidence |
-| “Prepared with Perplexity Deep Research” | OK as research credit; do not imply Perplexity runs the bot |
-| Passive AMM LP | Still true — emphasize Gateway txs + freeze date |
+1. `submission/simulations/` (SIMULATION_RESULTS.md + JSON)
+2. `configs/lp_rebalancer_race_800.yml` + `configs/lp_rebalancer_r003m_100.yml`
+3. `submission/strategy.md` (or `submission/orca_race_case/collateral/strategy.md`)
+4. `src/orca_tight_range/` + `controllers/`
+5. `research/cup_money_search.py`, `research/r003_multi_pool_replay.py`
+6. `docs/TRIALS_LEDGER.md`, `docs/RULES_DIGEST.md`
+7. Public repo: https://github.com/ajjcoppola/hummingbot-hackathon
+8. Chart: `submission/orca_race_case/images/orca-race-case.png`
