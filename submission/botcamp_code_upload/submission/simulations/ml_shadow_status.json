@@ -1,0 +1,9 @@
+{
+  "status": "SHADOW_ONLY_INSUFFICIENT_DATA",
+  "n_snapshot_rows": 6,
+  "promote_ready": false,
+  "rule_address": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+  "ml_address": null,
+  "note": "insufficient_examples n=0 need>=24",
+  "gate": "Promote ML only if it beats min(24h,7d) MAE on held-out snapshot days. With <48h of hourly snapshots this stays shadow."
+}

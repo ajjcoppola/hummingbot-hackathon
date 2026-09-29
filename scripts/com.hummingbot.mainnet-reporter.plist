@@ -29,11 +29,11 @@
     <key>PATH</key>
     <string>/usr/local/bin:/opt/homebrew/bin:/Users/ajjc/.orbstack/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     <key>REPORTER_RUN_ID</key>
-    <string>T015_mainnet_100_hb217_20260927</string>
+    <string>R003m_mainnet_100_w16_20260928</string>
     <key>REPORTER_WIDTH</key>
-    <string>1.0</string>
+    <string>16.0</string>
     <key>REPORTER_THRESHOLD_PCT</key>
-    <string>0.05</string>
+    <string>0.5</string>
     <key>REPORTER_TOTAL_AMOUNT_QUOTE</key>
     <string>100</string>
   </dict>

@@ -1,0 +1,21 @@
+# Race entry — dynamic farmer (SOL-USDC fee-tier ranker).
+# Width 16% full / thr 0.5 (R002 promote). Pool address comes from the
+# hourly Orca API ranker at runtime — do NOT hand-type one here.
+# Fallback if T017 fails: configs/lp_rebalancer_race_800.yml
+
+id: orca_dynamic_farmer_800
+controller_name: orca_dynamic_farmer
+controller_type: generic
+connector_name: solana-mainnet-beta
+lp_provider: orca/clmm
+trading_pair: SOL-USDC
+pool_address: ""
+total_amount_quote: 800
+side: RANGE
+position_width_pct: 16.0
+rebalance_threshold_pct: 0.5
+autoswap: true
+rank_interval_s: 3600
+race_hours: 48
+ml_shadow: true
+manual_kill_switch: false

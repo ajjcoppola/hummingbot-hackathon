@@ -1,0 +1,118 @@
+{
+  "ts": "2026-09-29T01:29:54.959129+00:00",
+  "capital_start": 800,
+  "data": "GeckoTerminal hourly SOL-USDC OHLCV on Czfq3xZZ, 2026-09-07 \u2192 2026-09-28",
+  "train_end": "2026-09-21T00:00:00Z",
+  "path": "1x concentration, high-low intra-hour (conservative)",
+  "no_loss_gate": "end_equity >= $800 (do not finish below start capital)",
+  "rejected_no_go": {
+    "name": "live tight band 1.0 / 0.05 (old live rules)",
+    "end_equity": 242.78,
+    "pnl_vs_800": -557.22,
+    "end_hodl": 857.67,
+    "n_rebals": 1224,
+    "verdict": "FAIL \u2014 loses more than half the book; no-go for race"
+  },
+  "pass_train_and_hold_absolute": [
+    {
+      "config": {
+        "rule": "sit_wide",
+        "width": 16.0,
+        "trigger": 0.05,
+        "hourly_cap": null,
+        "skew": 0.5,
+        "exhaustion": false
+      },
+      "train_end": 829.39,
+      "train_pnl": 29.39,
+      "train_vs_hodl": 4.36,
+      "hold_end": 824.85,
+      "hold_pnl": 24.85,
+      "hold_vs_hodl": -3.8,
+      "hold_med_edge": -1.38,
+      "hold_fees": 9.85,
+      "hold_rebals": 0
+    },
+    {
+      "config": {
+        "rule": "sit_wide",
+        "width": 8.0,
+        "trigger": 0.05,
+        "hourly_cap": null,
+        "skew": 0.5,
+        "exhaustion": false
+      },
+      "train_end": 816.32,
+      "train_pnl": 16.32,
+      "train_vs_hodl": -9.21,
+      "hold_end": 810.43,
+      "hold_pnl": 10.43,
+      "hold_vs_hodl": -18.8,
+      "hold_med_edge": -3.33,
+      "hold_fees": 2.67,
+      "hold_rebals": 0
+    },
+    {
+      "config": {
+        "rule": "chop_gate",
+        "width": 8.0,
+        "trigger": 0.05,
+        "hourly_cap": null,
+        "skew": 0.5,
+        "exhaustion": false
+      },
+      "train_end": 805.85,
+      "train_pnl": 5.85,
+      "train_vs_hodl": -19.68,
+      "hold_end": 801.37,
+      "hold_pnl": 1.37,
+      "hold_vs_hodl": -27.86,
+      "hold_med_edge": -1.6,
+      "hold_fees": 8.46,
+      "hold_rebals": 0
+    }
+  ],
+  "recommended_economic_shape": {
+    "name": "sit_wide 16% (open once, no recenter)",
+    "train_pnl_vs_800": 29.39,
+    "hold_pnl_vs_800": 24.85,
+    "verdict": "PASS absolute no-loss on train AND holdout"
+  },
+  "executable_race_config": {
+    "name": "lp_rebalancer 16% / 0.5 (near-sit-wide; rare recenter)",
+    "holdout_end_equity": 824.23,
+    "holdout_pnl_vs_800": 24.23,
+    "holdout_vs_hodl": -4.42,
+    "holdout_median_48h_edge": 0.38,
+    "holdout_fees": 13.38,
+    "holdout_rebals": 1,
+    "train_note": "Train window absolute equity 752 (\u221248) after a recenter into the SOL rally; holdout with 1 rebal finishes 824 (+24). Shape matches sit_wide when threshold is 0.5.",
+    "verdict": "HOLDOUT PASS absolute no-loss; use as race YAML because official controller cannot \u201csit forever\u201d without a threshold"
+  },
+  "r003_holdout_czfq_sit_wide": {
+    "end_equity": 830.45,
+    "end_hodl": 821.32,
+    "pnl_vs_800": 30.45,
+    "edge_vs_hodl": 9.13,
+    "caveat": "constant_TVL fee napkin",
+    "verdict": "PASS absolute + beats HODL on holdout under constant-TVL caveat"
+  },
+  "ml": {
+    "status": "SHADOW_ONLY_INSUFFICIENT_DATA",
+    "n_snapshot_rows": 6,
+    "promote_ready": false,
+    "rule_address": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+    "ml_address": null,
+    "note": "insufficient_examples n=0 need>=24",
+    "gate": "Promote ML only if it beats min(24h,7d) MAE on held-out snapshot days. With <48h of hourly snapshots this stays shadow."
+  },
+  "files": [
+    "SIMULATION_RESULTS.md",
+    "r002_cup_grid.json",
+    "r002_curves.json",
+    "r003_multi_pool.json",
+    "no_loss_gate.json",
+    "holdout_grid_leaderboard.json",
+    "ml_shadow_status.json"
+  ]
+}

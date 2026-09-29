@@ -1,20 +1,18 @@
-# Botcamp strategy form — paste-ready
+# Botcamp strategy form — paste-ready (2026-09-28)
 
-Use these fields on [https://www.botcamp.xyz](https://www.botcamp.xyz) (New Strategy / Hackathon application). All markdown is allowed in the long fields.
+Deadline: **EOD 2026-09-30**. Simulation pack: `submission/simulations/SIMULATION_RESULTS.md`.
 
 ## Strategy Type
 
-Agent - AI/autonomous trading agent
-
-(If the form also accepts Controller, pick **Controller** as a second tag: the runnable artifact is a Hummingbot V2 controller. Condor is optional narration only.)
+Controller (Hummingbot V2). Condor is narration only — it does not trade.
 
 ## Summary
 
-Tight-range Whirlpool market maker on Orca that maximizes fee capture per dollar via aggressive ±1–2% concentrated liquidity, directional range-skewing, a flush-exhaustion filter, and offline parameter search before live Gateway deployment.
+Wide-band Orca SOL/USDC Whirlpool LP on `Czfq3xZZ…`: **16%** width, **0.5** rebalance threshold. Offline grid (R002) shows the old 1% band loses **−$557** (no-go); sit-wide 16% finishes **+$29 / +$25** on train/holdout (absolute no-loss). Race YAML matches that economics. Volume = fees-implied traded volume. LLM does not trade.
 
 ## Tags
 
-`market-making` `lp` `orca` `solana` `gateway` `whirlpools` `clmm`
+`market-making` `lp` `orca` `solana` `gateway` `whirlpools` `clmm` `simulation`
 
 ## Exchanges
 
@@ -22,66 +20,69 @@ Orca (primary). Eligible venue: Solana.
 
 ## Description
 
-This agent implements an active, tight-range concentrated liquidity market making strategy on **Orca Whirlpools (Solana)**, targeting **SOL/USDC**. Instead of a passive full-range LP, it holds an ultra-narrow tick range (±1–2% of spot). A ±1% band is on the order of **200x** the capital efficiency of a full-range position; ±5% is still ~40x — the closest thing to leverage on a spot AMM without borrowing.
+This agent holds **one** concentrated SOL/USDC position on Orca Whirlpool `Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE` (0.04% fee). Execution is official Hummingbot V2 **`lp_rebalancer`** + Gateway `orca/clmm`.
 
-When price exits the current range, the agent closes the position and immediately reopens a new tight range centered on the updated price. A directional skew module biases the band using short-term momentum. A **volatility-exhaustion filter** defers re-centering during a one-bar flush so the agent does not lock in realized IL at the worst print. A **gas cap** (`max_rebalances_per_hour = 6`) and a **15% drawdown kill-switch** keep the 48-hour race from death-spiraling.
+### Simulation gate (required)
 
-Net objective for the race window: **Fees − Realized IL − Gas**, not long-horizon IL minimization.
+Losing money in simulation is a **no-go**. Same Gecko hourly path, $800 start, 1× share:
 
-The LLM never places trades. Policy is deterministic Python (`src/orca_tight_range/logic.py`). Hummingbot `LPExecutor` + Gateway execute on-chain. Offline research (pandas / optional zipline-reloaded) only writes YAML parameters.
+| Config | Holdout end | PnL vs $800 | Verdict |
+| --- | ---: | ---: | --- |
+| Old tight **1.0 / 0.05** | $243 | **−$557** | **NO-GO** (1,224 rebals) |
+| **sit_wide 16%** | $825 | **+$25** (train +$29) | **PASS** both windows |
+| Race **16% / 0.5** | $824 | **+$24** | Holdout PASS (near sit-wide; 1 rebal) |
+| R003 Czfq holdout | $830 | **+$30** (+$9 vs HODL) | PASS (constant-TVL caveat) |
+
+Full grid (310 train configs), no-loss survivors, curves, and ML shadow status: **`submission/simulations/`**.
+
+### Thesis
+
+Tightening a CLMM band scales fees and loss-versus-rebalancing together — not free leverage. Wide band + rare recenter keeps capital above start while collecting fees. True SOL-USDC tier screen (`tokensBothOf`) finds only Czfq above $500k TVL for an $800 deposit. Botcamp **Volume (40%)** = traded volume implied by **fees earned** (not own open/close swaps).
+
+### Live
+
+Proof run **R003m** ($100, 16/0.5) started 2026-09-28 after cancelling tight-band T016. No unfinished-clock P&L claimed. Race capital on Botcamp is $800 (`configs/lp_rebalancer_race_800.yml`).
+
+LLM never places or cancels LP.
 
 ## Markets
 
-- **Primary venue:** Orca Whirlpools via Hummingbot Gateway (`lp_provider: orca/clmm`)
-- **Primary pair:** SOL/USDC (0.30% fee tier; adaptive fees in vol)
-- **Network:** `solana-mainnet-beta` for the race; `devnet` for dry runs
-- **Research data only (no execution):** Binance SOL/USDT OHLCV for range/rebalance search
-- **Not used (US ToS):** Binance Global, Gate, Bitget, Hyperliquid, Derive
-
-
+- Orca Whirlpools via Gateway `orca/clmm`
+- SOL/USDC on `Czfq3xZZ…` (0.04%)
+- `solana-mainnet-beta`
+- Not used: Binance Global, Gate, Bitget, Hyperliquid, Derive
 
 ## Parameters
 
-
-| Parameter                        | Default | Description                                                         |
-| -------------------------------- | ------- | ------------------------------------------------------------------- |
-| `range_width_pct`                | 1.5     | Half-width of the tick band around spot (±1.5%)                     |
-| `skew_bias`                      | 0.6     | Fraction of the band on the momentum-favored side (0.5 = symmetric) |
-| `rebalance_trigger_pct`          | 0.8     | Min deviation from center before a reopen is allowed                |
-| `volatility_exhaustion_window_s` | 300     | Lookback used to tell a flush from a trend                          |
-| `max_rebalances_per_hour`        | 6       | Gas / MEV cap                                                       |
-| `capital_allocation_usdc`        | 800     | Race starting capital (Botcamp-funded)                              |
-| `stop_loss_drawdown_pct`         | 15      | Hard halt                                                           |
-
-
-
+| Parameter | Race value | Note |
+| --- | --- | --- |
+| `position_width_pct` | 16.0 | Full band (~±8%) |
+| `rebalance_threshold_pct` | 0.5 | Rare recenter ≈ sit_wide |
+| `total_amount_quote` | 800 | Botcamp custody |
+| `autoswap` | true | |
+| `pool_address` | Czfq3xZZ… | Orca API only |
 
 ## Status
 
-Devnet Gateway loop proven (open → close → reopen on Orca SOL–devUSDC Whirlpool; see `docs/TRIALS_LEDGER.md` T001–T003). Official `lp_rebalancer` + `orca/clmm` is the unattended race path; custom `orca_tight_range` policy shares the same width/trigger defaults. Code freeze 2026-08-31.
+Simulation pack attached. Live R003m in progress (ledger). T016 cancelled. Entry freeze 2026-10-01; race 2026-10-06.
 
 ## Events
 
-- `RangeOpened` — new Whirlpool position (center, tick bounds)
-- `RangeExited` — price left the band; evaluate rebalance
-- `RebalanceExecuted` — old position closed, new tight band opened
-- `RebalanceDeferred` — exhaustion filter blocked a flush recenter
-- `RateLimited` — gas cap hit
-- `StopLossTriggered` — 15% drawdown; agent halted
-
-
+Range open / hold in-band / rare rebalance past 0.5% threshold. Fee accrual drives Volume.
 
 ## Video Link
 
-Paste the YouTube / Loom / Drive URL after recording `[demo_script.md](demo_script.md)`.
+```
+https://www.loom.com/share/687d7c1047534d259b19a4807ea0ef61
+```
 
-## Team ranking
+Re-record if the video still sells ±1.5% / “200× leverage”.
 
-1. **Orca**
-2. Meteora (same Gateway / Solana LP path if Orca seats fill)
+## Code / resources to upload
 
-
-
-## One-paragraph team application (if they ask "why Orca")
-
-I am applying to race for Orca with a tight-range Whirlpool LP on SOL/USDC. The 48-hour finals reward fee-per-dollar, not multi-week IL minimization, so the agent concentrates liquidity in a ±1–2% band, recenters when price leaves, and refuses to recenter into a one-bar flush. Execution is Hummingbot Gateway `orca/clmm` plus the official LP executor — the same stack Orca already sponsors. I am a US person, so CEX sponsors and Hyperliquid/Derive are ToS-off-limits; Orca is the legal, on-theme venue.
+1. `submission/simulations/` (**SIMULATION_RESULTS.md**, grid JSON, ML status)
+2. `configs/lp_rebalancer_race_800.yml` + `configs/lp_rebalancer_r003m_100.yml`
+3. `submission/strategy.md`
+4. `src/orca_tight_range/` + `controllers/`
+5. `research/cup_money_search.py`, `research/r003_multi_pool_replay.py`
+6. `docs/TRIALS_LEDGER.md`, `docs/RULES_DIGEST.md`

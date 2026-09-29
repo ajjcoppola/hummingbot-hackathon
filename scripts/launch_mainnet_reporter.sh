@@ -6,9 +6,9 @@ export PATH="/usr/local/bin:/opt/homebrew/bin:${HOME}/.orbstack/bin:/usr/bin:/bi
 ROOT="${HOME}/proj/hummingbot-hackathon"
 cd "$ROOT"
 mkdir -p data/devnet_runs
-RUN_ID="${REPORTER_RUN_ID:-T015_mainnet_100_hb217_20260927}"
-WIDTH="${REPORTER_WIDTH:-1.0}"
-THRESHOLD="${REPORTER_THRESHOLD_PCT:-0.05}"
+RUN_ID="${REPORTER_RUN_ID:-R003m_mainnet_100_w16_20260928}"
+WIDTH="${REPORTER_WIDTH:-16.0}"
+THRESHOLD="${REPORTER_THRESHOLD_PCT:-0.5}"
 QUOTE="${REPORTER_TOTAL_AMOUNT_QUOTE:-100}"
 exec /usr/bin/env PYTHONUNBUFFERED=1 /opt/homebrew/bin/python3 -u \
   research/devnet_run_reporter.py \

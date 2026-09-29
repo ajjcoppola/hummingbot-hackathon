@@ -1,0 +1,20 @@
+# T017 smoke — dynamic farmer at $100 after T016 ends (2026-09-30 18:26Z).
+# Run until ~2026-10-01 16:00Z (~20h). Pass criteria in docs/TRIALS_LEDGER.md.
+# Do NOT start while T016 is still the active book.
+
+id: orca_dynamic_farmer_100
+controller_name: orca_dynamic_farmer
+controller_type: generic
+connector_name: solana-mainnet-beta
+lp_provider: orca/clmm
+trading_pair: SOL-USDC
+pool_address: ""
+total_amount_quote: 100
+side: RANGE
+position_width_pct: 16.0
+rebalance_threshold_pct: 0.5
+autoswap: true
+rank_interval_s: 3600
+race_hours: 20
+ml_shadow: true
+manual_kill_switch: false

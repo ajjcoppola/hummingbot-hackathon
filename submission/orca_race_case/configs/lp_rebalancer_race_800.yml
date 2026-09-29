@@ -1,0 +1,20 @@
+# FALLBACK ONLY — official lp_rebalancer if T017 (dynamic farmer) fails.
+# Width 16 / thr 0.5 / quote 800 (R002 holdout promote).
+# pool_address from Orca API tokensBothOf=SOL,USDC ranker top after hard
+# filters (2026-09-28 R003): only Czfq3xZZ… clears TVL≥$500k. Used only if T017 fails.
+
+id: orca_lp_rebalancer_race_800
+controller_name: lp_rebalancer
+controller_type: generic
+connector_name: solana-mainnet-beta
+lp_provider: orca/clmm
+trading_pair: SOL-USDC
+pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"
+total_amount_quote: 800
+side: RANGE
+position_width_pct: 16.0
+position_offset_pct: 0.0
+rebalance_threshold_pct: 0.5
+autoswap: true
+swap_buffer_pct: 0.01
+manual_kill_switch: false

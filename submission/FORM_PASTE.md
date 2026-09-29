@@ -27,7 +27,7 @@ If there is a secondary type / tag for the runnable artifact, also mark **Contro
 ## Summary
 
 ```
-Tight-range Orca Whirlpool LP on Solana that maximizes fee-per-dollar in a short race window via ±1.5% concentrated RANGE liquidity, automated close/reopen when price leaves the band, and Hummingbot Gateway execution (LPExecutor / lp_rebalancer). Deterministic policy in Python; LLM never places or cancels LP.
+Wide-band Orca SOL/USDC Whirlpool LP (16% / 0.5) on Czfq3xZZ. Simulation no-loss gate: old 1% band −$557 (rejected); sit-wide 16% +$29/+$25 train/holdout; race YAML holdout +$24. Fees-implied Volume. Deterministic lp_rebalancer + Gateway; LLM does not trade. See submission/simulations/.
 ```
 
 *(Old summary implied zipline-validated params before live. New: Devnet open→close→reopen proven; zipline grid deferred past freeze.)*

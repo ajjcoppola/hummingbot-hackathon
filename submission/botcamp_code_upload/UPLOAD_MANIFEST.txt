@@ -1,16 +1,36 @@
-Agent Builders Cup — Orca tight-range LP
-Bundle prepared 2026-08-27
+Agent Builders Cup — Orca wide-band SOL/USDC LP
+Bundle refreshed 2026-09-28 (Beta-Checkpoint)
+
+**CENTRAL COLLATERAL (start here for selection conversation):**
+  submission/orca_race_case/README.md
+  submission/orca_race_case/pdf/orca-race-case.pdf
+  submission/orca_race_case/pdf/cup-800-sim.pdf
+  submission/orca_race_case/sims/
+  submission/orca_race_case/collateral/
+  submission/orca_race_case/configs/
+
+MUST UPLOAD (simulation proof):
+  submission/simulations/  (also mirrored under orca_race_case/sims/)
+  submission/orca_race_case/pdf/
 
 Start here:
   submission/strategy.md
   submission/APPLICATION.md
-  docs/INSTALL_PLAN.md
-  docs/TRIALS_LEDGER.md (T001–T003 Devnet open/close/reopen)
-  configs/lp_rebalancer_devnet.yml
-  src/orca_tight_range/logic.py
-  controllers/orca_tight_range_controller.py
-  research/orca_backtest_zipline.py
-  research/zipline_to_gateway_bridge.py
+  submission/BOTCAMP_PAGE_UPDATE_20260928.md
+  configs/lp_rebalancer_race_800.yml
+  configs/lp_rebalancer_r003m_100.yml
+  docs/TRIALS_LEDGER.md
+  docs/RULES_DIGEST.md
+  src/orca_tight_range/
+  controllers/orca_dynamic_farmer_controller.py
+  research/cup_money_search.py
+  research/r003_multi_pool_replay.py
 
-Devnet pool (verified): 3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt
+Mainnet pool (API): Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE
 No wallet keys or .env files are included.
+
+No-loss gate summary:
+  REJECT 1.0/0.05 → $243 (−$557)
+  PASS sit_wide 16% → train +$29 / hold +$25
+  Race 16/0.5 holdout → +$24
+  ML → shadow only (insufficient snapshots)

@@ -7,6 +7,7 @@ Unlike research/devnet_watchdog.py this script:
   - Restarts Gateway on repeated position-info failures
   - Soft-restarts only for mild OOR (inside limit-price hysteresis)
   - Auto adopt --recycle when past auto-close limits (stranded LP after FAILED close)
+  - Hard-restart when one bot is running and no LP is open (dust-swap flat loop)
   - Optionally restarts the endurance reporter if its log goes stale
 
 Why soft-restart is not enough for "stuck OOR":
@@ -79,6 +80,24 @@ def restart_reporter(run_id: str) -> dict[str, Any]:
     return {"code": p.returncode, "stdout": (p.stdout or "")[:500], "stderr": (p.stderr or "")[:300]}
 
 
+def flat_restart_decision(
+    *,
+    n_running: int,
+    n_pos: int,
+    flat_streak: int,
+    flat_polls: int,
+    cooldown_active: bool,
+) -> str:
+    """Action name when a bot is up and the wallet has no LP. Empty string otherwise."""
+    if n_running != 1 or n_pos != 0:
+        return ""
+    if flat_streak < flat_polls:
+        return "watching_flat"
+    if cooldown_active:
+        return "flat_restart_cooldown"
+    return "flat_hard_restart"
+
+
 def adopt_recycle(*, restart_gateway_flag: bool = True) -> dict[str, Any]:
     cmd = [
         sys.executable,
@@ -89,6 +108,23 @@ def adopt_recycle(*, restart_gateway_flag: bool = True) -> dict[str, Any]:
     if restart_gateway_flag:
         cmd.append("--restart-gateway")
     p = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=300)
+    return {
+        "code": p.returncode,
+        "stdout": (p.stdout or "")[-800:],
+        "stderr": (p.stderr or "")[:400],
+    }
+
+
+def flat_hard_restart() -> dict[str, Any]:
+    """Redeploy when the bot is running and no LP exists. adopt --recycle refuses that case."""
+    cmd = [
+        sys.executable,
+        str(ROOT / "scripts" / "mainnet_bot_ops.py"),
+        "--wait-s",
+        "300",
+        "hard-restart",
+    ]
+    p = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=420)
     return {
         "code": p.returncode,
         "stdout": (p.stdout or "")[-800:],
@@ -128,6 +164,7 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
         "ts": utc_now(),
         "action": "none",
         "detail": "",
+        "pool_switch": int(state.get("pool_switch", 0)),
     }
 
     try:
@@ -156,6 +193,39 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
     row["n_positions"] = len(pos)
     row["in_range"] = [p.get("in_range") for p in pos]
     row["addresses"] = [p.get("position_address") for p in pos]
+    row["watch_pool"] = args.pool
+
+    # Pool-switch counter (48h rolling). Seeded by args.pool changes and optional
+    # switch log written by the dynamic farmer.
+    switch_ts: list[float] = list(state.get("pool_switch_timestamps") or [])
+    switch_log = ROOT / "data" / "mainnet_watchdog" / "pool_switches.jsonl"
+    if switch_log.exists():
+        try:
+            for line in switch_log.read_text().splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                ev = json.loads(line)
+                ts = float(ev.get("ts_unix") or 0)
+                if ts and ts not in switch_ts:
+                    switch_ts.append(ts)
+        except (OSError, json.JSONDecodeError, TypeError, ValueError):
+            pass
+    last_pool = state.get("last_pool")
+    if last_pool and args.pool and args.pool != last_pool:
+        switch_ts.append(time.time())
+    if args.pool:
+        state["last_pool"] = args.pool
+    now = time.time()
+    switch_ts = [t for t in switch_ts if now - t <= 48 * 3600]
+    state["pool_switch_timestamps"] = switch_ts
+    state["pool_switch"] = len(switch_ts)
+    row["pool_switch"] = len(switch_ts)
+    if len(switch_ts) > 3:
+        row["action"] = "alert_pool_switch_cap"
+        row["detail"] = f"pool_switch={len(switch_ts)} > 3 in 48h"
+        append_jsonl(log_path, row)
+        return row
 
     info_ok = True
     if len(pos) == 1 and pos[0].get("position_address"):
@@ -191,9 +261,15 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
     else:
         state["past_limit_streak"] = 0
 
+    if len(running) == 1 and len(pos) == 0:
+        state["flat_streak"] = state.get("flat_streak", 0) + 1
+    else:
+        state["flat_streak"] = 0
+
     row["oor_streak"] = state["oor_streak"]
     row["past_limit_streak"] = state["past_limit_streak"]
     row["info_fail_streak"] = state["info_fail_streak"]
+    row["flat_streak"] = state["flat_streak"]
 
     if not row["gateway_running"]:
         row["action"] = "alert_gateway_down"
@@ -274,6 +350,30 @@ def check_once(args: argparse.Namespace, state: dict[str, Any], log_path: Path) 
             row["detail"] = f"{bot} code={code} {detail[:200]}"
             state["last_soft_restart_ts"] = time.time()
             state["oor_streak"] = 0
+    elif len(running) == 1 and len(pos) == 0:
+        cooldown_active = (time.time() - (state.get("last_flat_restart_ts") or 0)) < args.flat_restart_cooldown_s
+        decision = flat_restart_decision(
+            n_running=len(running),
+            n_pos=len(pos),
+            flat_streak=state["flat_streak"],
+            flat_polls=args.flat_polls,
+            cooldown_active=cooldown_active,
+        )
+        row["action"] = decision
+        row["detail"] = f"running bot, 0 LP, streak {state['flat_streak']}/{args.flat_polls}"
+        if decision == "flat_hard_restart":
+            if args.dry_run:
+                row["action"] = "would_flat_hard_restart"
+            else:
+                result = flat_hard_restart()
+                code = (result or {}).get("code", 1)
+                row["detail"] = {"streak": state["flat_streak"], "result": result}
+                state["last_flat_restart_ts"] = time.time()
+                state["flat_streak"] = 0
+                if code != 0:
+                    row["action"] = "flat_hard_restart_failed"
+                elif args.reporter_run_id:
+                    row["reporter"] = restart_reporter(args.reporter_run_id)
     elif args.reporter_run_id and reporter_stale(args.reporter_run_id, args.reporter_stale_s):
         if args.dry_run:
             row["action"] = "would_restart_reporter"
@@ -320,6 +420,18 @@ def main() -> int:
     )
     p.add_argument("--restart-cooldown-s", type=int, default=900)
     p.add_argument("--recycle-cooldown-s", type=int, default=3600)
+    p.add_argument(
+        "--flat-polls",
+        type=int,
+        default=3,
+        help="Hard-restart after N polls with one running bot and zero LP",
+    )
+    p.add_argument(
+        "--flat-restart-cooldown-s",
+        type=int,
+        default=1200,
+        help="Minimum seconds between flat hard-restarts",
+    )
     p.add_argument(
         "--recycle-fail-alert",
         type=int,

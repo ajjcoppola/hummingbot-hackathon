@@ -1,0 +1,237 @@
+{
+  "ts": "2026-09-28T23:32:54.024662+00:00",
+  "caveat": "constant_TVL_approx. R002 pool_screen used tokens=SOL,USDC (OR) and mislabelled non-SOL-USDC pools as higher fee intensity. R003 uses tokensBothOf. Only pools with TVL>=500k are promotion-eligible.",
+  "min_tvl_usd": 500000.0,
+  "train_end": 1789948800.0,
+  "n_api_sol_usdc": 20,
+  "n_pass_hard_filter": 1,
+  "ranked_top": [
+    {
+      "address": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+      "fee_pct": 0.04,
+      "tvl": 30919405.245669223,
+      "score": 0.002052440954205245
+    }
+  ],
+  "research_meta": {
+    "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE": {
+      "address": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+      "fee": 0.0004,
+      "tvl": 30919405.245669223,
+      "label": "0.04%",
+      "passes_hard_filter": true,
+      "filter_reason": "ok",
+      "score": 0.002052440954205245
+    },
+    "83v8iPyZihDEjDdY8RdZddyZNyUtXngz69Lgo9Kt5d6d": {
+      "address": "83v8iPyZihDEjDdY8RdZddyZNyUtXngz69Lgo9Kt5d6d",
+      "fee": 0.0001,
+      "tvl": 87197.18439546406,
+      "label": "0.01%",
+      "passes_hard_filter": false,
+      "filter_reason": "tvl<500000",
+      "score": 0.002428009066789142
+    },
+    "FpCMFDFGYotvufJ7HrFHsWEiiQCGbkLCtwHiDnh7o28Q": {
+      "address": "FpCMFDFGYotvufJ7HrFHsWEiiQCGbkLCtwHiDnh7o28Q",
+      "fee": 0.0002,
+      "tvl": 147918.59527437724,
+      "label": "0.02%",
+      "passes_hard_filter": false,
+      "filter_reason": "tvl<500000",
+      "score": 0.00041020206042123494
+    },
+    "Esvfxt3jMDdtTZqLF1fqRhDjzM8Bpr7fZxJMrK69PB7e": {
+      "address": "Esvfxt3jMDdtTZqLF1fqRhDjzM8Bpr7fZxJMrK69PB7e",
+      "fee": 0.0002,
+      "tvl": 36658.60961166959,
+      "label": "0.02%",
+      "passes_hard_filter": false,
+      "filter_reason": "tvl<500000",
+      "score": 0.0010031942470475395
+    },
+    "7qbRF6YsyGuLUVs6Y1q64bdVrfe4ZcUUz1JRdoVNUJnm": {
+      "address": "7qbRF6YsyGuLUVs6Y1q64bdVrfe4ZcUUz1JRdoVNUJnm",
+      "fee": 0.0005,
+      "tvl": 235949.07235686318,
+      "label": "0.05%",
+      "passes_hard_filter": false,
+      "filter_reason": "tvl<500000",
+      "score": 0.00022021916541094708
+    }
+  },
+  "sit_wide_16pct_1x": [
+    {
+      "address": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+      "label": "0.04%",
+      "fee": 0.0004,
+      "tvl": 30919405.245669223,
+      "window": "train",
+      "end_equity": 880.869752197917,
+      "end_hodl": 978.1491853241043,
+      "fees": 65.79342737686645,
+      "edge": -97.27943312618731,
+      "n_bars": 808,
+      "passes_hard_filter": true,
+      "note": "constant_TVL_approx"
+    },
+    {
+      "address": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+      "label": "0.04%",
+      "fee": 0.0004,
+      "tvl": 30919405.245669223,
+      "window": "holdout",
+      "end_equity": 830.446451751203,
+      "end_hodl": 821.3203985445382,
+      "fees": 16.74935729441568,
+      "edge": 9.126053206664778,
+      "n_bars": 192,
+      "passes_hard_filter": true,
+      "note": "constant_TVL_approx"
+    },
+    {
+      "address": "83v8iPyZihDEjDdY8RdZddyZNyUtXngz69Lgo9Kt5d6d",
+      "label": "0.01%",
+      "fee": 0.0001,
+      "tvl": 87197.18439546406,
+      "window": "train",
+      "end_equity": 818.7807079481256,
+      "end_hodl": 978.1491853241043,
+      "fees": 3.7043831270750314,
+      "edge": -159.36847737597873,
+      "n_bars": 808,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    },
+    {
+      "address": "83v8iPyZihDEjDdY8RdZddyZNyUtXngz69Lgo9Kt5d6d",
+      "label": "0.01%",
+      "fee": 0.0001,
+      "tvl": 87197.18439546406,
+      "window": "holdout",
+      "end_equity": 834.1839589629669,
+      "end_hodl": 821.5156077952666,
+      "fees": 20.429999269267697,
+      "edge": 12.66835116770028,
+      "n_bars": 192,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    },
+    {
+      "address": "FpCMFDFGYotvufJ7HrFHsWEiiQCGbkLCtwHiDnh7o28Q",
+      "label": "0.02%",
+      "fee": 0.0002,
+      "tvl": 147918.59527437724,
+      "window": "train",
+      "end_equity": 830.2190384258374,
+      "end_hodl": 978.2085809803079,
+      "fees": 15.142713604787241,
+      "edge": -147.98954255447052,
+      "n_bars": 808,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    },
+    {
+      "address": "FpCMFDFGYotvufJ7HrFHsWEiiQCGbkLCtwHiDnh7o28Q",
+      "label": "0.02%",
+      "fee": 0.0002,
+      "tvl": 147918.59527437724,
+      "window": "holdout",
+      "end_equity": 817.2566716889036,
+      "end_hodl": 821.5156077952666,
+      "fees": 3.502711995204352,
+      "edge": -4.25893610636308,
+      "n_bars": 192,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    },
+    {
+      "address": "Esvfxt3jMDdtTZqLF1fqRhDjzM8Bpr7fZxJMrK69PB7e",
+      "label": "0.02%",
+      "fee": 0.0002,
+      "tvl": 36658.60961166959,
+      "window": "train",
+      "end_equity": 818.3381743440979,
+      "end_hodl": 976.8761782493907,
+      "fees": 3.2618495230471973,
+      "edge": -158.53800390529284,
+      "n_bars": 808,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    },
+    {
+      "address": "Esvfxt3jMDdtTZqLF1fqRhDjzM8Bpr7fZxJMrK69PB7e",
+      "label": "0.02%",
+      "fee": 0.0002,
+      "tvl": 36658.60961166959,
+      "window": "holdout",
+      "end_equity": 820.580352654782,
+      "end_hodl": 820.3350079334597,
+      "fees": 7.188812622498081,
+      "edge": 0.24534472132233986,
+      "n_bars": 192,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    },
+    {
+      "address": "7qbRF6YsyGuLUVs6Y1q64bdVrfe4ZcUUz1JRdoVNUJnm",
+      "label": "0.05%",
+      "fee": 0.0005,
+      "tvl": 235949.07235686318,
+      "window": "train",
+      "end_equity": 822.6269162128503,
+      "end_hodl": 979.5971063957722,
+      "fees": 7.5505913917986796,
+      "edge": -156.9701901829219,
+      "n_bars": 808,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    },
+    {
+      "address": "7qbRF6YsyGuLUVs6Y1q64bdVrfe4ZcUUz1JRdoVNUJnm",
+      "label": "0.05%",
+      "fee": 0.0005,
+      "tvl": 235949.07235686318,
+      "window": "holdout",
+      "end_equity": 815.7796471377359,
+      "end_hodl": 821.9949975684947,
+      "fees": 1.891173230665869,
+      "edge": -6.215350430758804,
+      "n_bars": 192,
+      "passes_hard_filter": false,
+      "note": "constant_TVL_approx; FAIL_FILTER:tvl<500000"
+    }
+  ],
+  "switcher_train": {
+    "window": "train",
+    "end_equity": 880.869752197917,
+    "end_hodl": 978.1491853241043,
+    "edge": -97.27943312618731,
+    "fees": 65.79342737686645,
+    "gas": 0.0,
+    "switches": 0,
+    "final_pool": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+    "n_bars": 808,
+    "note": "constant_TVL_approx; hard_filters applied via decide_switch"
+  },
+  "switcher_holdout": {
+    "window": "holdout",
+    "end_equity": 830.446451751203,
+    "end_hodl": 821.3203985445382,
+    "edge": 9.126053206664778,
+    "fees": 16.74935729441568,
+    "gas": 0.0,
+    "switches": 0,
+    "final_pool": "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
+    "n_bars": 192,
+    "note": "constant_TVL_approx; hard_filters applied via decide_switch"
+  },
+  "promotes_vs_czfq_holdout": [],
+  "n_series": {
+    "Czfq3xZZDmsd": 1000,
+    "83v8iPyZihDE": 1000,
+    "FpCMFDFGYotv": 1000,
+    "Esvfxt3jMDdt": 1000,
+    "7qbRF6YsyGuL": 1000
+  }
+}

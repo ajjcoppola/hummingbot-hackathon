@@ -1,0 +1,70 @@
+{
+  "gate": "end_equity >= 800 on train AND holdout (1x highlow path)",
+  "n_pass": 3,
+  "n_train_configs": 306,
+  "top": [
+    {
+      "config": {
+        "rule": "sit_wide",
+        "width": 16.0,
+        "trigger": 0.05,
+        "hourly_cap": null,
+        "skew": 0.5,
+        "exhaustion": false
+      },
+      "train_end": 829.39,
+      "train_pnl": 29.39,
+      "train_vs_hodl": 4.36,
+      "hold_end": 824.85,
+      "hold_pnl": 24.85,
+      "hold_vs_hodl": -3.8,
+      "hold_med_edge": -1.38,
+      "hold_fees": 9.85,
+      "hold_rebals": 0
+    },
+    {
+      "config": {
+        "rule": "sit_wide",
+        "width": 8.0,
+        "trigger": 0.05,
+        "hourly_cap": null,
+        "skew": 0.5,
+        "exhaustion": false
+      },
+      "train_end": 816.32,
+      "train_pnl": 16.32,
+      "train_vs_hodl": -9.21,
+      "hold_end": 810.43,
+      "hold_pnl": 10.43,
+      "hold_vs_hodl": -18.8,
+      "hold_med_edge": -3.33,
+      "hold_fees": 2.67,
+      "hold_rebals": 0
+    },
+    {
+      "config": {
+        "rule": "chop_gate",
+        "width": 8.0,
+        "trigger": 0.05,
+        "hourly_cap": null,
+        "skew": 0.5,
+        "exhaustion": false
+      },
+      "train_end": 805.85,
+      "train_pnl": 5.85,
+      "train_vs_hodl": -19.68,
+      "hold_end": 801.37,
+      "hold_pnl": 1.37,
+      "hold_vs_hodl": -27.86,
+      "hold_med_edge": -1.6,
+      "hold_fees": 8.46,
+      "hold_rebals": 0
+    }
+  ],
+  "race_config": null,
+  "baseline_rejected": {
+    "end_equity": 242.78,
+    "end_hodl": 857.67,
+    "passes_gate": false
+  }
+}
