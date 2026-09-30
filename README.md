@@ -20,6 +20,8 @@ Early Cup drafts sold “tight-range leverage” (±1–2% bands, frequent recen
 
 Full pack: [`submission/simulations/`](submission/simulations/) · race case: [`submission/orca_race_case/`](submission/orca_race_case/).
 
+[Loom Video Explainer](https://www.loom.com/share/978ba7b355f3452786cca4bf787ef02a)
+
 ### Simulation chart (R002 cup money search)
 
 ![Cup $800 sim — tight band collapses; wide / race shape stays near hold](submission/orca_race_case/images/orca-race-case.png)
