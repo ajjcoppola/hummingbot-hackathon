@@ -115,7 +115,7 @@ Range open / hold in-band / rare rebalance when spot moves >0.5% past band edge.
 https://www.loom.com/share/687d7c1047534d259b19a4807ea0ef61
 ```
 
-Re-record if the Loom still sells ±1.5% / “200× leverage”. Race chart image: `submission/orca_race_case/images/orca-race-case.png`.
+**Re-record** with `submission/VIDEO_SCRIPT_WIDE_BAND.md` (wide-band 16/0.5 + sim gate + live `status`). Replace this URL once the new Loom is up. Chart B-roll: `submission/orca_race_case/images/orca-race-case.png`.
 
 ---
 
