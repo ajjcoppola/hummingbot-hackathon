@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Cup race autotimer: wait until Botcamp start (2026-10-07T02:00Z), deploy,
+  flatten at end (2026-10-09T02:00Z).
+
+  Install:
+    cp scripts/com.hummingbot.cup-race-autotimer.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.hummingbot.cup-race-autotimer.plist
+
+  Requires Amphetamine indefinite — sleep pauses this process's sleep().
+  KeepAlive=false so it does not loop after done.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hummingbot.cup-race-autotimer</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/ajjc/proj/hummingbot-hackathon/scripts/cup_race_autotimer.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <false/>
+  <key>StandardOutPath</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon/data/cup_race_autotimer/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/ajjc/proj/hummingbot-hackathon/data/cup_race_autotimer/launchd.err.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/Users/ajjc/.orbstack/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>HB_HACKATHON_ROOT</key>
+    <string>/Users/ajjc/proj/hummingbot-hackathon</string>
+    <key>CUP_RACE_START_UTC</key>
+    <string>2026-10-07T02:00:00Z</string>
+    <key>CUP_RACE_END_UTC</key>
+    <string>2026-10-09T02:00:00Z</string>
+  </dict>
+</dict>
+</plist>

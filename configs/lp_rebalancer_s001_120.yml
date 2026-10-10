@@ -1,0 +1,20 @@
+# S001 — shadow race-shaped live (post-R003m STOP; Kraken ACH hold).
+# Width 16% / thr 0.5 on Czfq. Quote sized to wallet (~$159 equity;
+# 87.5 USDC + 0.59 SOL @ ~$120) with SOL gas/rent buffer → quote 120.
+# Not Botcamp $800. Do not invent pool addresses.
+
+id: orca_tight_mainnet_smoke
+controller_name: lp_rebalancer
+controller_type: generic
+connector_name: solana-mainnet-beta
+lp_provider: orca/clmm
+trading_pair: SOL-USDC
+pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"
+total_amount_quote: 120
+side: RANGE
+position_width_pct: 16.0
+position_offset_pct: 0.0
+rebalance_threshold_pct: 0.5
+autoswap: true
+swap_buffer_pct: 0.01
+manual_kill_switch: false

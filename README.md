@@ -6,7 +6,7 @@ Agent Builders Cup entry for the **Orca** team. The product name above is unchan
 
 Official Botcamp timeline (2026): registration / application through **Sep 30**; refine until finals; finals start **Oct 1**; race **Oct 6**. Scoring: Volume 40% / P&L 40% / HBOT Vote 20%. Volume = **fees-implied** traded volume (not our own open/close swaps).
 
-Live path: **Hummingbot `lp_rebalancer` + Gateway `orca/clmm`** (pinned 2.17). Condor is UI / narration only — LLM must not place or cancel LP. Install: [`docs/INSTALL_PLAN.md`](docs/INSTALL_PLAN.md). Ops: [`docs/MAINNET_OPS.md`](docs/MAINNET_OPS.md).
+Live path: **Hummingbot `lp_rebalancer` + Gateway `orca/clmm`** (pinned 2.17). Condor is UI / narration only — LLM must not place or cancel LP. Install: [`docs/INSTALL_PLAN.md`](docs/INSTALL_PLAN.md). Ops: [`docs/MAINNET_OPS.md`](docs/MAINNET_OPS.md). Cup host: **Mac** — [`docs/RACE_HOST.md`](docs/RACE_HOST.md) · start: [`docs/RACE_START_MAC.md`](docs/RACE_START_MAC.md). Hermes backup (copy, no Condor): [`docs/HERMES_COPY_MIGRATE.md`](docs/HERMES_COPY_MIGRATE.md).
 
 ## Why the algo changed (tight → wide)
 

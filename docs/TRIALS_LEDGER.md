@@ -25,11 +25,17 @@ One row per parameter change. No silent grid sweeps. Deflate any Sharpe-like cla
 | R001 | 2026-09-27 | 0.5     | 0.05      | 0.6  | synthetic 48h 1m (pandas grid)                | offline                    | fee toy 85.9 | IL toy 79.5 | gas toy 21 | net toy −14.6 | RESEARCH — `python3 research/orca_backtest_zipline.py --grid`. Bridge → `configs/orca_tight_range_from_grid.yml` + `configs/lp_rebalancer_mainnet_from_grid.yml`. **Not live** until real SOL-USDC CSV. |
 | R002 | 2026-09-28 | 16.0    | 0.5       | —    | mainnet Czfq3xZZ hourly (Gecko 7–28 Sep)      | offline train 7–21 / hold 21–28 | hold ~$13 | — | ~$0.02 | hold edge +$0.38 / +$0.60 | RESEARCH — napkin + 5 bots (`research/cup_money_search.py`). Baseline 1.0/0.05 → ~$243 vs ~$858 HODL (**PASS**). Holdout **PROMOTE**: live_rebalancer **16%/0.5** at **1×**. Artifacts: `data/cup_grid_20260928.json`, canvas `cup-800-sim`. |
 | R003 | 2026-09-28 | 16.0    | 0.5       | —    | true SOL-USDC tiers (`tokensBothOf`) + Gecko hourly | offline train 7–21 / hold 21–28 | Czfq sit-wide hold fees ~$17 | — | 0 | switcher hold edge +$9.13 (0 switches) | RESEARCH — corrects R002 OR-filter mislabel. Only `Czfq3xZZ…` clears TVL≥$500k. `data/r003_grid_20260928.json`. |
-| R003m | 2026-09-28 | 16.0    | 0.5       | —    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | **48h RESTART live** ~20:25Z | close fees on recycle | — | — | — | RESTART — paid Helius applied; closed orphan `2etfm4ed…` tx `2bRCprMv…`; bot `…202448`, LP `5nNNxiXi…` in-range ~109.4–128.5. Watchdog+reporter relaunched (anti-flake sticky). Config `configs/lp_rebalancer_r003m_100.yml`. Run-id `R003m_mainnet_100_w16_20260928`. |
+| R003m | 2026-09-28 | 16.0    | 0.5       | —    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | **48h PASS then STOP** 2026-10-02 | fees ~0.0022 SOL + ~$0.26 at 48h; later recycle fees | — | — | MTM 48h **+$0.12** vs open $118.20 | PASS 48h on `5nNNxiXi…` (99.9% in-range, 0 rebals). Post-48h orphan recycle → `78Spb3n7…`. **STOPPED** 2026-10-02: agents paused, LP closed, flat wallet ~0.59 SOL + ~49.5 USDC for Kraken money-out cycle. |
+| S001 | 2026-10-06 | 16.0    | 0.5       | —    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | **STOP** ~12.4h (pre-race pause) | fees ~0.00038 SOL + ~$0.046 | — | — | MTM ~$157.9 flat | STOP 2026-10-06 ~17:16Z — pause until Cup. Agents booted out; LP `8kbPtUQx…` closed (Gateway close returned 400 but on-chain account gone). Flat wallet **~0.597 SOL + ~87.2 USDC**. **Host decision:** Mac primary for Cup (`docs/RACE_HOST.md` / `RACE_START_MAC.md`); Hermes copy-migrate backup (`HERMES_COPY_MIGRATE.md`); Cursor Cloud/Grok rejected as race host. Not Botcamp $800. |
 | T017 | 2026-09-30 | 16.0    | 0.5       | —    | dynamic farmer $100                           | **superseded by R003m**    | — | — | — | — | SKIP — time box: race entry is `lp_rebalancer` 16/0.5; dynamic farmer research-only unless R003m fails before freeze. |
 
 
 
+
+### Live ops notes (2026-10-06 host)
+
+- **Cup host = Mac** (Amphetamine + LaunchAgents). Cursor Cloud / Grok agent **rejected** as 48h race host. Hermes = optional **copy-migrate** of existing API/gateway-files (no Condor): `docs/HERMES_COPY_MIGRATE.md`, `scripts/hermes/`.
+- **Cup autotimer:** Botcamp window `2026-10-07T02:00Z`–`2026-10-09T02:00Z` (from leaderboard). LaunchAgent `com.hummingbot.cup-race-autotimer` → `scripts/cup_race_autotimer.sh` starts at open, flattens at +48h. Keep Amphetamine indefinite.
 
 ### Live ops notes (2026-09-22 resume)
 

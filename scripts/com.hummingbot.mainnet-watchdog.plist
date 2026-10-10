@@ -31,7 +31,7 @@
     <key>PATH</key>
     <string>/usr/local/bin:/opt/homebrew/bin:/Users/ajjc/.orbstack/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     <key>WATCHDOG_REPORTER_RUN_ID</key>
-    <string>R003m_mainnet_100_w16_20260928</string>
+    <string>S001_mainnet_120_w16_20261006</string>
     <key>WATCHDOG_THRESHOLD_PCT</key>
     <string>0.5</string>
   </dict>

@@ -1,0 +1,22 @@
+[Unit]
+Description=Hummingbot mainnet health watchdog (Hermes)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=REPLACE_USER
+Group=REPLACE_USER
+WorkingDirectory=/opt/hummingbot-hackathon
+Environment=HB_HACKATHON_ROOT=/opt/hummingbot-hackathon
+Environment=HB_API_URL=http://127.0.0.1:8000
+Environment=WATCHDOG_REPORTER_RUN_ID=S001_mainnet_120_w16_20261006
+Environment=WATCHDOG_THRESHOLD_PCT=0.5
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+ExecStart=/bin/zsh /opt/hummingbot-hackathon/scripts/launch_mainnet_watchdog.sh
+Restart=always
+RestartSec=10
+# Do not start from Cursor agent shells; this unit is the KeepAlive.
+
+[Install]
+WantedBy=multi-user.target

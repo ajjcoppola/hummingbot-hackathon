@@ -2,9 +2,13 @@
 
 zsh-safe **one-liners**. Do not paste multi-line JSON curls.
 
-**Active trial:** `R003m_mainnet_100_w16_20260928` — Hummingbot + Gateway **`version-2.17.0`**, width **16%**, threshold **0.5**, ~$100 quote (race-shaped; replaces cancelled T016).  
-**Race entry YAML:** `configs/lp_rebalancer_race_800.yml` (same band, quote 800).  
-**Deferred:** VPS port → [`docs/future-plans/`](future-plans/README.md).  
+**Active trial:** `S001_mainnet_120_w16_20261006` — **STOPPED** 2026-10-06 ~17:16Z (pre-Cup pause). Flat on-chain ~0.597 SOL + ~87.2 USDC. Restart with `hard-restart` + LaunchAgent bootstrap when race opens.  
+**Race host:** **Mac** (primary) — [`RACE_HOST.md`](RACE_HOST.md) · Cup open: [`RACE_START_MAC.md`](RACE_START_MAC.md).  
+**Cup window:** `2026-10-07T02:00Z` → `2026-10-09T02:00Z` — LaunchAgent `com.hummingbot.cup-race-autotimer` (Amphetamine required).  
+**Hermes backup:** copy-migrate (no Condor) — [`HERMES_COPY_MIGRATE.md`](HERMES_COPY_MIGRATE.md).  
+**Not a race host:** Cursor Cloud / Grok agents (see RACE_HOST).  
+**Race entry YAML:** `configs/lp_rebalancer_race_800.yml` (same band, quote 800 when funded).  
+**Live YAML:** `configs/lp_rebalancer_s001_120.yml` → API `orca_tight_mainnet_smoke`.  
 **IL / pool primer:** [`docs/IL_AND_POOL_DYNAMICS.md`](IL_AND_POOL_DYNAMICS.md).  
 **Self-fund $800:** [`docs/UNSANCTIONED_800.md`](UNSANCTIONED_800.md) (do not deploy until wallet funded).
 
@@ -21,7 +25,7 @@ Before you leave the laptop for multi-day runs:
 3. Fresh heartbeats (age &lt; 5 min):
    ```bash
    tail -1 data/mainnet_watchdog/watchdog.jsonl
-   tail -2 data/devnet_runs/R003m_mainnet_100_w16_20260928.reporter.log
+   tail -2 data/devnet_runs/S001_mainnet_120_w16_20261006.reporter.log
    ```
 4. `python3 scripts/mainnet_bot_ops.py status` → `ok: true`, one bot, one in-range LP.
 5. Confirm images: `docker ps` shows `hummingbot:version-2.17.0` and `gateway:version-2.17.0`.

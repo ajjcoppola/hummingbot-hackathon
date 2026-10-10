@@ -47,4 +47,4 @@ Unsanctioned ≠ invisible. Track lots for tax. No vote-farming claims. Submissi
 
 ## Hermes
 
-Laptop remains the host until you execute [`docs/future-plans/HERMES_WATCHDOG_PORT.md`](future-plans/HERMES_WATCHDOG_PORT.md).
+Cup primary host is the Mac — [`RACE_HOST.md`](RACE_HOST.md). Backup off-Mac path is **copy-migrate** (no Condor): [`HERMES_COPY_MIGRATE.md`](HERMES_COPY_MIGRATE.md). Older full-rebuild plan: [`future-plans/HERMES_WATCHDOG_PORT.md`](future-plans/HERMES_WATCHDOG_PORT.md).

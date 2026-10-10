@@ -1,0 +1,23 @@
+[Unit]
+Description=Hummingbot mainnet endurance reporter (Hermes)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=REPLACE_USER
+Group=REPLACE_USER
+WorkingDirectory=/opt/hummingbot-hackathon
+Environment=HB_HACKATHON_ROOT=/opt/hummingbot-hackathon
+Environment=HB_API_URL=http://127.0.0.1:8000
+Environment=REPORTER_RUN_ID=S001_mainnet_120_w16_20261006
+Environment=REPORTER_WIDTH=16.0
+Environment=REPORTER_THRESHOLD_PCT=0.5
+Environment=REPORTER_TOTAL_AMOUNT_QUOTE=120
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+ExecStart=/bin/zsh /opt/hummingbot-hackathon/scripts/launch_mainnet_reporter.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
