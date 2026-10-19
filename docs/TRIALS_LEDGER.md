@@ -27,10 +27,18 @@ One row per parameter change. No silent grid sweeps. Deflate any Sharpe-like cla
 | R003 | 2026-09-28 | 16.0    | 0.5       | —    | true SOL-USDC tiers (`tokensBothOf`) + Gecko hourly | offline train 7–21 / hold 21–28 | Czfq sit-wide hold fees ~$17 | — | 0 | switcher hold edge +$9.13 (0 switches) | RESEARCH — corrects R002 OR-filter mislabel. Only `Czfq3xZZ…` clears TVL≥$500k. `data/r003_grid_20260928.json`. |
 | R003m | 2026-09-28 | 16.0    | 0.5       | —    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | **48h PASS then STOP** 2026-10-02 | fees ~0.0022 SOL + ~$0.26 at 48h; later recycle fees | — | — | MTM 48h **+$0.12** vs open $118.20 | PASS 48h on `5nNNxiXi…` (99.9% in-range, 0 rebals). Post-48h orphan recycle → `78Spb3n7…`. **STOPPED** 2026-10-02: agents paused, LP closed, flat wallet ~0.59 SOL + ~49.5 USDC for Kraken money-out cycle. |
 | S001 | 2026-10-06 | 16.0    | 0.5       | —    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | **STOP** ~12.4h (pre-race pause) | fees ~0.00038 SOL + ~$0.046 | — | — | MTM ~$157.9 flat | STOP 2026-10-06 ~17:16Z — pause until Cup. Agents booted out; LP `8kbPtUQx…` closed (Gateway close returned 400 but on-chain account gone). Flat wallet **~0.597 SOL + ~87.2 USDC**. **Host decision:** Mac primary for Cup (`docs/RACE_HOST.md` / `RACE_START_MAC.md`); Hermes copy-migrate backup (`HERMES_COPY_MIGRATE.md`); Cursor Cloud/Grok rejected as race host. Not Botcamp $800. |
+| S001-Cup | 2026-10-07 | 16.0    | 0.5       | 0    | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | **48h Cup shadow** 02:00Z→+48h | fees ~$0.63 | dump IL | — | MTM **−6.64%** ($158.08→$147.59) | STOP after Cup — naked 16%/0.5, offset 0, no equity kill. Equity: `data/cup_race_autotimer/equity_48h.json`. Postmortem → dump-protected S002. |
+| S002 | 2026-10-10 | 16.0    | 0.5       | −4 BUY | solana-mainnet-beta orca SOL-USDC `Czfq3xZZ…` | **SUPERSEDED** 2026-10-17 (never live) | — | — | — | replay −3.46% Cup | SUPERSEDED by R004 — sleeve 40% / LP 90 / BUY −4 / −3% equity kill only lost less than naked. Files kept (`docs/DUMP_PROTECTED_SPEC.md`, `configs/lp_rebalancer_dump_protected_120.yml`, `scripts/equity_kill.py`); kill script may be reused as a breaker. |
+| R004 | 2026-10-17 | 2.0 (SELL band) | — | — | Czfq 5m Gecko candles Sep 21–Oct 17 + fee k from own LP (R003m pre-Cup 1.21e-11) | offline train Sep 21–Oct 7 / hold Cup 48h + Oct 9–17 | F&F 27d $36.73 | — | 0.05% swap + $0.005/tx | **Cup +0.41%**, post +1.57%, 27d **+7.82%** (SOL −8.09%), dd 3.7% | RESEARCH — Flush & Fade: USDC default; arm on SOL ≥3% drop over 6h with ≥2× volume; buy on 0.8% lift; exit via SOL-only band entry→+2% (`side: SELL`, offset 0, width 2); 24h time stop; 4% stop (2–6% tied on train; 2% → Cup −1.5%). 7 trades, all wins (3 train). Fast trend regimes 0/3600 positive in Cup. `research/cup_alpha_replay.py`, `research/r004_flush_bounce.py`, `data/alpha/r004_summary.json`. **Not live.** Port to `src/orca_tight_range/logic.py` `decide()` before any trial. |
 | T017 | 2026-09-30 | 16.0    | 0.5       | —    | dynamic farmer $100                           | **superseded by R003m**    | — | — | — | — | SKIP — time box: race entry is `lp_rebalancer` 16/0.5; dynamic farmer research-only unless R003m fails before freeze. |
 
 
 
+
+### Live ops notes (2026-10-10 dump-protected PREP)
+
+- **S002 PREP** (not live): `configs/lp_rebalancer_dump_protected_120.yml` + `docs/DUMP_PROTECTED_SPEC.md`. Before deploy: leave ~40% USDC undeposited, load `com.hummingbot.equity-kill` (`scripts/com.hummingbot.equity-kill.plist`), set `EQUITY_KILL_OPEN` to deploy book USD.
+- Blog / replay: `docs/blog/czfq-dump-protected-postmortem.md`, `docs/blog/czfq-dump-protected-replay.md`.
 
 ### Live ops notes (2026-10-06 host)
 

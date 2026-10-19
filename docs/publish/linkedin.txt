@@ -1,0 +1,17 @@
+We ran a 48-hour shadow of the Hummingbot Orca Cup on SOL-USDC.
+SOL fell about 8%. A plain liquidity position lost 6.6%.
+The two official Orca drivers lost 0.6% and 1.8% by stepping out of inventory.
+
+After the fact, on 27 days of real 5-minute data (rules chosen before the Cup):
+sit in USDC, and only after a high-volume flush buy SOL and sell the bounce
+through a fee-earning Orca band. Replay: +0.4% in the Cup, +7.8% over 27 days
+while SOL fell 8%. Seven trades. A research result, not a live claim.
+
+- We ran a 48-hour shadow of the Hummingbot Agent Builders Cup on Orca SOL-USDC (Whirlpool `Czfq3xZZ…`, 0.04% fee). SOL fell about 8%. Our naked wide-band LP lost 6.64% — about −$53 on an $800 book (a linear scale of our ~$158 shadow; we did not deposit $800).
+- Orca’s two official drivers lost −0.59% (Victor Adeleke) and −1.82% (Hoang La) on live $800 with similar volume. They stepped out of or reshaped their inventory. We did not.
+- After the fact we replayed 27 days of real 5-minute Czfq data, with fees calibrated from our own on-chain positions. Always-on LP, tight bands, and even fast trend switches lost money in the Cup. On this pool, fees roughly equal the LP’s loss to arbitrage, so being IN is not an edge by itself.
+- What did work, with rules chosen on pre-Cup data only, is Flush & Fade: sit in USDC, and only after a high-volume flush buy SOL and sell the bounce back through a SOL-only Orca band that earns fees on the way up. Replay: +0.41% in the Cup window (ahead of both drivers), +7.8% over 27 days while SOL fell 8.1%, max drawdown 3.7%.
+- It is 7 trades. We show every one, and the parameter that could have flipped the Cup result. This is a research result, not live P&L.
+
+Full letter: https://investitnow.substack.com
+Not investment advice. Past windows are not future results.

@@ -1,0 +1,23 @@
+# S002 dump-protected — same Czfq 16%/0.5 shell as S001 Cup shadow, with risk budget.
+# Cash sleeve (ops): leave ~40% of book in USDC undeposited.
+# LP notional ~60% → quote 90 on a ~$150 wallet.
+# side BUY + negative offset: spot in upper band → USDC-heavy at open
+# (RANGE ignores position_offset_pct — see docs/DUMP_PROTECTED_SPEC.md).
+# Equity kill (−3%) is scripts/equity_kill.py, not this YAML.
+# Do not invent pool addresses.
+
+id: orca_tight_dump_protected
+controller_name: lp_rebalancer
+controller_type: generic
+connector_name: solana-mainnet-beta
+lp_provider: orca/clmm
+trading_pair: SOL-USDC
+pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"
+total_amount_quote: 90
+side: BUY
+position_width_pct: 16.0
+position_offset_pct: -4.0
+rebalance_threshold_pct: 0.5
+autoswap: true
+swap_buffer_pct: 0.01
+manual_kill_switch: false

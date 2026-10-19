@@ -1,0 +1,95 @@
+{
+  "fetched": "2026-10-17",
+  "pools": [
+    {
+      "address": "4fuUiYxTQ6QCrdSq9ouBYcTM7bqSwYTSyLueGZLTy4T4",
+      "fee_rate": 0.0001,
+      "tvl": 532862.7671418951,
+      "vol24": 115839.657212703,
+      "fees24": 11.583737795528695,
+      "apr_pool": 0.007934621362355553,
+      "tickSpacing": 1
+    },
+    {
+      "address": "6roDBCzBtvuY4cYzfAkDfn3rrMmFSQhuXzBmddKYvm2V",
+      "fee_rate": 0.0001,
+      "tvl": 3022.69285830121,
+      "vol24": 2432.29135731433,
+      "fees24": 0.245512510438801,
+      "apr_pool": 0.02964643465645578,
+      "tickSpacing": 1
+    },
+    {
+      "address": "FPPHjpjBk98pd5Z3xXQuDcrZdUdqfraCRJU8yvdT1ZKR",
+      "fee_rate": 0.0002,
+      "tvl": 2467.890756993139,
+      "vol24": 26.8659434046539,
+      "fees24": 0.005375042041529324,
+      "apr_pool": 0.000794966446387018,
+      "tickSpacing": 2
+    },
+    {
+      "address": "CxF3jKhGrauHQjFk8L5XUkLTjmeLFqHUYHLCYYSautMC",
+      "fee_rate": 0.0005,
+      "tvl": 2160.31866658233,
+      "vol24": 0.723421664540101,
+      "fees24": 0.000362521351734514,
+      "apr_pool": 6.125035876879734e-05,
+      "tickSpacing": 8
+    },
+    {
+      "address": "ELqXddRqcnRJXQnqZdPwBXEEBpQ6SEbCQrBe12wpHBU",
+      "fee_rate": 0.0004,
+      "tvl": 1264.2073832712858,
+      "vol24": 0.0,
+      "fees24": 0.0,
+      "apr_pool": 0.0,
+      "tickSpacing": 4
+    },
+    {
+      "address": "Es7bSM24764r8RUzoL8eecf9VVjeJmLTjZ6NSbo8MXtL",
+      "fee_rate": 0.0005,
+      "tvl": 96.99394702235746,
+      "vol24": 0.0,
+      "fees24": 0.0,
+      "apr_pool": 0.0,
+      "tickSpacing": 8
+    },
+    {
+      "address": "C4V6MRsJ2L9X9qB8mSiT3uvCzn5kUBP3uaWCqoEZEnv8",
+      "fee_rate": 0.02,
+      "tvl": 0.6988460133140382,
+      "vol24": 0.0,
+      "fees24": 0.0,
+      "apr_pool": 0.0,
+      "tickSpacing": 256
+    },
+    {
+      "address": "6apMj56v2L2YcKojA56o2yXD4LZv7jG7WnhCpyim15AV",
+      "fee_rate": 0.002,
+      "tvl": 0.45173967216242217,
+      "vol24": 0.0005492025,
+      "fees24": 1.9971e-06,
+      "apr_pool": 0.001613631799285298,
+      "tickSpacing": 64
+    },
+    {
+      "address": "Eom4XSgQCPYgF6LR4UDDqEmGvvyQN5RWDXyhq7QHxmM5",
+      "fee_rate": 0.02,
+      "tvl": 0.41064701376053614,
+      "vol24": 0.0,
+      "fees24": 0.0,
+      "apr_pool": 0.0,
+      "tickSpacing": 256
+    },
+    {
+      "address": "96tuRVrsAoiSj8jCyQj7hz5CUbRHU5BtfC6noJQfBkZ6",
+      "fee_rate": 0.003,
+      "tvl": 0.04707248211892348,
+      "vol24": 0.0,
+      "fees24": 0.0,
+      "apr_pool": 0.0,
+      "tickSpacing": 64
+    }
+  ]
+}

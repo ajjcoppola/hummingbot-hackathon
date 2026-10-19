@@ -1,0 +1,11 @@
+1/6 We shadowed the Hummingbot Orca Cup on SOL-USDC. SOL fell ~8% in 48h. Our plain LP lost 6.6% (~$53 on an $800 scale). Fees were about $0.63. Volume is not profit.
+
+2/6 Orca's two live drivers lost less on a real $800: Victor −0.59% (leave when vol is extreme) and Hoang −1.82% (trend-shaped range). Same order of volume. They refused inventory. We didn't.
+
+3/6 On this pool, fees roughly equal the LP's loss to arbitrage. Tighter bands and faster trend switches did not help: 0 of 3,600 fast-regime variants made money in the Cup window.
+
+4/6 What did, with rules frozen before the Cup: sit in USDC. After a ≥3% drop in 6h on ≥2× volume, buy the bounce and sell it through a SOL-only Orca band (+2%) that earns the swap fee.
+
+5/6 Replay, not live: +0.41% in the 48h Cup (ahead of both drivers) and +7.8% over 27 days while SOL fell 8.1%. Seven trades. A 2% stop instead of 4% flips the Cup to −1.5%. Small sample.
+
+6/6 Full letter on https://investitnow.substack.com. Orca/Solana only. Not advice. @alananjcoppola
