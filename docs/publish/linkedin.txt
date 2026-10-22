@@ -13,5 +13,5 @@ while SOL fell 8%. Seven trades. A research result, not a live claim.
 - What did work, with rules chosen on pre-Cup data only, is Flush & Fade: sit in USDC, and only after a high-volume flush buy SOL and sell the bounce back through a SOL-only Orca band that earns fees on the way up. Replay: +0.41% in the Cup window (ahead of both drivers), +7.8% over 27 days while SOL fell 8.1%, max drawdown 3.7%.
 - It is 7 trades. We show every one, and the parameter that could have flipped the Cup result. This is a research result, not live P&L.
 
-Full letter: https://investitnow.substack.com
+Full letter: https://investitnow.substack.com/p/flush-and-fade-the-orca-cup
 Not investment advice. Past windows are not future results.

@@ -1,10 +1,12 @@
 ---
 title: In and Out | The Orca Cup
 tags: [investing, crypto, solana, market-making]
-canonicalUrl: https://investitnow.substack.com
+canonicalUrl: https://investitnow.substack.com/p/flush-and-fade-the-orca-cup
 ---
 
 # In and Out | The Orca Cup
+
+Published as [Flush & Fade | The Orca Cup](https://investitnow.substack.com/p/flush-and-fade-the-orca-cup). That URL is what goes out on Substack, Discord, X, and LinkedIn. Discord announcement: https://discord.com/channels/530578568154054663/1501467059903533096/1562827151021965375
 
 InvestIt Now — Alan & Jeff
 

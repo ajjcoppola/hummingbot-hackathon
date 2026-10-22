@@ -33,7 +33,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "docs" / "blog" / "in-and-out-orca-cup.md"
 OUT = ROOT / "docs" / "publish"
 TITLE = "In and Out | The Orca Cup"
-CANONICAL = "https://investitnow.substack.com"
+CANONICAL = "https://investitnow.substack.com/p/flush-and-fade-the-orca-cup"
 X_HANDLE = "@alananjcoppola"
 
 

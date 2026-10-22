@@ -1,6 +1,10 @@
 # Publishing the Cup letter
 
-Canonical text: [`docs/blog/in-and-out-orca-cup.md`](../blog/in-and-out-orca-cup.md).
+**Live post:** [Flush & Fade | The Orca Cup](https://investitnow.substack.com/p/flush-and-fade-the-orca-cup)
+
+That URL is the one shared on Substack, Discord, X (@alananjcoppola), and LinkedIn. Discord announcement: https://discord.com/channels/530578568154054663/1501467059903533096/1562827151021965375
+
+Source text: [`docs/blog/in-and-out-orca-cup.md`](../blog/in-and-out-orca-cup.md).
 
 ```bash
 python3 scripts/publish_report.py

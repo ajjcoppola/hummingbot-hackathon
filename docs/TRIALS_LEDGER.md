@@ -35,6 +35,10 @@ One row per parameter change. No silent grid sweeps. Deflate any Sharpe-like cla
 
 
 
+### Live ops notes (2026-10-22 published letter)
+
+- Public post: https://investitnow.substack.com/p/flush-and-fade-the-orca-cup — shared on Substack, Discord, X, and LinkedIn. Discord message: https://discord.com/channels/530578568154054663/1501467059903533096/1562827151021965375
+
 ### Live ops notes (2026-10-10 dump-protected PREP)
 
 - **S002 PREP** (not live): `configs/lp_rebalancer_dump_protected_120.yml` + `docs/DUMP_PROTECTED_SPEC.md`. Before deploy: leave ~40% USDC undeposited, load `com.hummingbot.equity-kill` (`scripts/com.hummingbot.equity-kill.plist`), set `EQUITY_KILL_OPEN` to deploy book USD.
