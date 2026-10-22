@@ -2,13 +2,11 @@
 
 Substack-ready narrative (In and Out voice, $800 scale): [`in-and-out-orca-cup.md`](in-and-out-orca-cup.md).
 
-**Superseded 2026-10-17:** the sleeve + −3% kill below only lost less (−3.5% replay). The public letter now uses Flush & Fade (R004, `research/r004_flush_bounce.py`).
+**Superseded 2026-10-17.** The sleeve + −3% kill below only lost less (−3.5% replay). The public letter uses Flush & Fade.
 
-**Superseded 2026-10-17:** the sleeve + −3% kill below only lost less (−3.5% replay). The public letter now uses Flush & Fade (R004, `research/r004_flush_bounce.py`).
+![Ending value of $800. Flush & Fade replaces the sleeve.](images/cup-ending-800.png)
 
-**Superseded 2026-10-17:** the sleeve + −3% kill below only lost less (−3.5% replay). The public letter now uses Flush & Fade (R004, `research/r004_flush_bounce.py`).
-
-**Superseded 2026-10-17:** the sleeve + −3% kill below only lost less (−3.5% replay). The public letter now uses Flush & Fade (R004, `research/r004_flush_bounce.py`).
+*Charts, the rule, and the next trial: [`in-and-out-orca-cup.md`](in-and-out-orca-cup.md).*
 
 We ran the Cup-shaped 16% / 0.5 bot on Orca’s big SOL-USDC pool (`Czfq3xZZ…`). SOL dumped. Mark-to-market went **~$158 → ~$148 (−6.64%)** in 48h while fees were only about **$0.63**. The confusing question afterward: *Czfq is huge — who is making money?*
 

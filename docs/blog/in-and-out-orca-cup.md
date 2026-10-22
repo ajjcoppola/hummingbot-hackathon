@@ -60,6 +60,10 @@ SOL in the window: **$118.81 → $109.38 (−7.9%)**. Fees on the LP: about **$0
 
 Scaled fees about **$3.20**; scaled fee-implied volume about **$8,000**. Contest volume is not wallet profit.
 
+![Ending value of an $800 book after the Cup. Flush & Fade finishes just above $800. The naked LP finishes near $747.](images/cup-ending-800.png)
+
+*Ending value of $800 after the 48 hours. This is the “Orca Cup Who Lost Less” comparison: our shadow scaled up, the two live Orca drivers, cash, a 50/50 hold, and the later Flush & Fade replay. The axis starts at $730 so the gap is readable. Replay is not a live fill.*
+
 ## Why that was wrong for the goal
 
 1. **Wrong payoff model.** Being in a huge pool is not “printing.” Fees minus divergence matched the result.
@@ -97,6 +101,10 @@ We rebuilt the weekend with real data instead of opinions:
 - **Fees:** calibrated from **our own on-chain LP fee accrual** — what one unit of our liquidity actually earned per dollar of pool volume. We use the pre-Cup calibration so the Cup does not leak into the fee level (the Cup itself paid ~50% more per unit, so this is conservative).
 - **Check:** the replay of our naked 16% LP loses **−5.65%** in the Cup vs **−6.64%** real (the gap is idle wallet SOL the shadow carried).
 
+![Cup replay returns on the same candles. Only Flush & Fade is positive.](images/cup-replay-returns.png)
+
+*Same 48 hours, same candles, our code. A faster trend switch and rough copies of the two Orca drivers still lose. Those copies are not their live fills. Only sitting out, then buying the flush, finishes above zero.*
+
 What failed, and why it matters:
 
 | Idea | Cup 48h (replay) | Lesson |
@@ -116,6 +124,10 @@ The core finding: on Czfq, **fees roughly equal the LP’s loss to arbitrage** a
 ## Thesis
 
 Liquidity is cheap most of the time and scarce in a flush. When SOL drops fast on heavy volume, forced sellers (liquidations, stops, panic) overshoot, and whoever **takes the other side right after** gets paid by the snap-back. On Orca we can do that and still earn LP fees: buy the flush, then **sell the bounce through a single-sided SOL band** above entry. The band is a limit sell that earns 0.04% as it fills. The rest of the time we are OUT, in USDC.
+
+![SOL price through the Cup, with the single Flush & Fade entry marked.](images/cup-sol-and-entry.png)
+
+*Setup on the actual path. SOL grinded down for a day and a half, then broke. The rule stayed in USDC until 15:40Z on Oct 8, bought at $109.02 after the flush, and sold the bounce through a SOL-only band from that price up to +2%.*
 
 ## The rule
 
@@ -140,7 +152,11 @@ All parameters were picked on **pre-Cup data only**, then frozen.
 
 At $800: **~$803** at the end of the Cup window (vs Victor ~$795, Hoang ~$785, our real shadow ~$747), and **~$863** after 27 days. Max drawdown over 27 days: **3.7%** (naked LP: 11.8%). With the Cup’s own fee level the Cup result is +0.53%.
 
-Chart and every trade: [orca-cup-who-lost-less.canvas.tsx](/Users/ajjc/.cursor/projects/Users-ajjc-proj-hummingbot-hackathon/canvases/orca-cup-who-lost-less.canvas.tsx).
+![27-day equity. Flush & Fade rises in steps while the naked LP and a 50/50 hold give back the September gain during the Cup.](images/equity-27d.png)
+
+*Results across regimes, not just the Cup. Flat green stretches are USDC. The shaded band is the 48-hour contest. The naked LP and a 50/50 hold ride SOL down. Flush & Fade is only in the market for the seven trades below.*
+
+The same four charts are the rendering of the Cursor canvas [orca-cup-who-lost-less.canvas.tsx](/Users/ajjc/.cursor/projects/Users-ajjc-proj-hummingbot-hackathon/canvases/orca-cup-who-lost-less.canvas.tsx). Numbers come from `research/artifacts/r004_summary.json`. Rebuild with `python3 research/render_cup_charts.py`.
 
 ## Every trade
 

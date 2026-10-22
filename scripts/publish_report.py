@@ -109,8 +109,9 @@ def write_drafts(md: str) -> dict[str, Path]:
         "linkedin": OUT / "linkedin.txt",
         "x": OUT / "x_thread.txt",
     }
-    files["substack"].write_text(md if md.endswith("\n") else md + "\n", encoding="utf-8")
-    files["medium"].write_text(medium(md), encoding="utf-8")
+    published = md.replace("](images/", "](../blog/images/")
+    files["substack"].write_text(published if published.endswith("\n") else published + "\n", encoding="utf-8")
+    files["medium"].write_text(medium(published), encoding="utf-8")
     files["linkedin"].write_text(linkedin(md) + "\n", encoding="utf-8")
     files["x"].write_text("\n\n".join(tweets(md)) + "\n", encoding="utf-8")
     return files
